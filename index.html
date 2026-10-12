@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f3f4ea" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Form First" />
+  <meta name="description" content="Form First — mobile-first five-day training plan with exercise form guidance and set logging." />
+  <script>try{const s=JSON.parse(localStorage.getItem('formfirst-5day-plan-v2')||'{}');document.documentElement.dataset.theme=s.darkMode?'dark':'light';document.documentElement.style.colorScheme=s.darkMode?'dark':'light'}catch(e){}</script>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <link rel="apple-touch-startup-image" href="./assets/branding/splash-poster.png" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>Form First · 5-Day Plan</title>
+</head>
+<body>
+  <div id="brandSplash" class="brand-splash" aria-hidden="true">
+    <video id="brandSplashVideo" class="brand-splash-media" muted playsinline preload="auto" poster="./assets/branding/splash-poster.png">
+      <source src="./assets/branding/form-first-splash.mp4" type="video/mp4" />
+    </video>
+    <img id="brandSplashFinal" class="brand-splash-media brand-splash-final" src="./assets/branding/splash-final-frame.png" alt="" />
+  </div>
+
+  <div id="app" class="app" aria-live="polite"></div>
+
+  <nav class="bottom-nav note-bottom-nav ios-tabbar" id="bottomNav" aria-label="Primary navigation">
+    <button class="nav-item active" type="button" data-nav="workout" aria-label="Workout" title="Workout">
+      <span class="nav-icon supplied-nav-icon" aria-hidden="true"><img src="./assets/nav/workout.png" alt="" draggable="false" /></span>
+    </button>
+    <button class="nav-item" type="button" data-nav="progress" aria-label="Progress" title="Progress">
+      <span class="nav-icon supplied-nav-icon" aria-hidden="true"><img src="./assets/nav/progress.png" alt="" draggable="false" /></span>
+    </button>
+    <button class="nav-item" type="button" data-nav="timer" aria-label="Timer" title="Timer">
+      <span class="nav-icon supplied-nav-icon" aria-hidden="true"><img src="./assets/nav/timer.png" alt="" draggable="false" /></span>
+    </button>
+  </nav>
+
+  <script src="./splash.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

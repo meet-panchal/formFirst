@@ -1,0 +1,26 @@
+import { ICON } from './icons.js';
+
+const TARGET_DESCRIPTIONS = Object.freeze({
+  'incline-press':'Emphasizes upper chest while front delts and triceps assist.','flat-press':'Trains chest through horizontal pressing with triceps assisting.','cable-fly':'Isolates chest through controlled shoulder adduction and stretch.','incline-curl':'Loads biceps strongly from a lengthened shoulder position.','hammer-curl':'Trains brachialis and biceps with a neutral grip.','cable-crunch':'Targets abs through loaded spinal flexion and controlled bracing.','deadbug-plank':'Builds deep core stability by resisting unwanted spinal movement.','cardio':'Builds steady aerobic endurance through sustained lower-body work.','d2-lat-pulldown':'Trains lats and upper back through vertical pulling.','d2-chest-row':'Emphasizes upper back while lats and rear delts assist.','d2-cable-pressdown':'Isolates triceps through elbow extension with upper arms fixed.','d2-overhead-triceps':'Biases triceps long head in an overhead stretched position.','d2-rear-delt':'Targets rear delts and upper back through horizontal abduction.','d2-russian-twist':'Trains obliques through controlled torso rotation under tension.','d2-side-plank':'Builds lateral core stability through anti-side-bending tension.','d2-cardio':'Builds steady aerobic endurance through sustained lower-body work.','d3-squat':'Trains quads and glutes through loaded knee and hip extension.','d3-rdl':'Emphasizes hamstrings and glutes through a controlled hip hinge.','d3-split-squat':'Trains quads and glutes one leg at a time.','d3-ham-curl':'Isolates hamstrings through controlled knee flexion.','d3-pallof':'Builds core stability by resisting cable-driven rotation.','d3-back-extension':'Trains spinal erectors and glutes through controlled hip extension.','d3-cardio':'Builds steady aerobic endurance through sustained lower-body work.','d4-shoulder-press':'Targets shoulders while triceps assist the overhead press.','d4-lateral-raise':'Isolates side delts through controlled arm elevation.','d4-incline-press':'Emphasizes upper chest while front delts and triceps assist.','d4-upright-row':'Trains side delts and upper traps through vertical pulling.','d4-shrugs':'Isolates upper traps through controlled shoulder elevation.','d4-leg-raise':'Targets lower abs and hip flexors through leg lifting.','d4-mountain-climber':'Trains core stability while hips drive alternating knee movement.','d4-cardio':'Builds steady aerobic endurance through sustained lower-body work.','d5-one-arm-row':'Trains lats and upper back through unilateral horizontal pulling.','d5-stiff-arm':'Isolates lats through shoulder extension with minimal elbow movement.','d5-curl':'Isolates biceps by fixing the upper arm during curling.','d5-one-arm-triceps':'Isolates one triceps through controlled overhead elbow extension.','d5-wrist-curl':'Targets the wrist flexors through controlled palm-up wrist flexion.','d5-wrist-extension':'Targets the wrist extensors through controlled palm-down wrist extension.','d5-wrist-rotation':'Targets the supinator and pronator muscles through controlled forearm rotation.','d5-neutral-preacher':'Emphasizes the brachioradialis with supported neutral-grip elbow flexion.','d5-bicycle':'Trains obliques and abs through alternating flexion and rotation.','d5-heel-taps':'Targets obliques through repeated side bending from a braced position.','d5-cardio':'Builds steady aerobic endurance through sustained lower-body work.'
+});
+
+function targetDescription(exercise) {
+  return TARGET_DESCRIPTIONS[exercise.id] || `Focuses on ${String(exercise.note || 'the target muscles').toLowerCase()}.`;
+}
+
+function formatMuscleLabel(label = '') {
+  const raw = String(label).trim();
+  if (!raw.includes('+')) return raw;
+  return raw.split('+').map(part => part.trim().replace(/\b([a-z])/g, char => char.toUpperCase())).join(' + ');
+}
+
+export function targetMarkup(exercise) {
+  const label = formatMuscleLabel(exercise.note);
+  return `<div class="target-copy"><span class="note-kicker">Target area</span><strong>${label}</strong><p>${targetDescription(exercise)}</p></div><div class="target-visual"><img class="target-muscle-image" src="${exercise.targetImage}" alt="Muscle diagram highlighting ${label}" /></div>`;
+}
+
+export function movementMarkup(exercise) {
+  if (exercise.image) return `<figure class="movement-figure edge-to-edge"><img src="${exercise.image}" alt="Lifelike illustration showing the start and finish positions for ${exercise.name}" /></figure>`;
+  if (!exercise.movementFrames?.length) return '';
+  return `<figure class="movement-figure edge-to-edge wg-movement-figure"><div class="wg-movement-pair" aria-label="Start and finish positions for ${exercise.name}"><div class="wg-frame"><img src="${exercise.movementFrames[0]}" alt="${exercise.name} start position" loading="eager" referrerpolicy="no-referrer" /></div><div class="wg-arrow" aria-hidden="true">${ICON.chevron}</div><div class="wg-frame"><img src="${exercise.movementFrames[1]}" alt="${exercise.name} finish position" loading="eager" referrerpolicy="no-referrer" /></div></div><figcaption class="movement-credit">Exercise art: Bryl Lim / Workout Guide · CC BY-SA 4.0</figcaption></figure>`;
+}
