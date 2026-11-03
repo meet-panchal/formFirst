@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'form-first-';
-const CACHE_NAME = `${CACHE_PREFIX}v34`;
+const CACHE_NAME = `${CACHE_PREFIX}v35`;
 const APP_SHELL = [
   './',
   './index.html',
@@ -17,7 +17,7 @@ const APP_SHELL = [
   './assets/nav/workout.png',
   './assets/nav/progress.png',
   './assets/nav/timer.png',
-  './assets/icons8-fire.gif'
+  './assets/icons8-fire-transparent.png'
 ];
 
 function isCacheable(response) {

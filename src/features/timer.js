@@ -175,7 +175,7 @@ export function createTimerFeature({
   function render() {
     const progress = progressPercent();
     app.innerHTML = `<main class="screen note-theme nav-screen">
-      <header class="topbar note-topbar workout-topbar"><span class="topbar-spacer" aria-hidden="true"></span><div class="topbar-title">Timer</div><button class="icon-btn note-icon-btn" id="moreBtn" aria-label="Settings">${ICON.settings}</button></header>
+      <header class="topbar note-topbar workout-topbar"><span class="topbar-spacer" aria-hidden="true"></span><span class="topbar-spacer" aria-hidden="true"></span><button class="icon-btn note-icon-btn" id="moreBtn" aria-label="Settings">${ICON.settings}</button></header>
       <div class="container nav-page-container timer-page">
         <section class="timer-note-card">
           <span class="note-kicker">Recovery</span><p>Keep the break intentional, then get back to your next set.</p>

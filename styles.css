@@ -40,7 +40,6 @@ input:focus-visible { outline: 3px solid rgba(52,120,246,.28); outline-offset:2p
 
 /* Native-like top bar */
 .topbar { position:sticky; top:0; z-index:30; display:grid; grid-template-columns:44px 1fr 44px; align-items:center; min-height:calc(58px + env(safe-area-inset-top)); padding:calc(env(safe-area-inset-top) + 7px) 14px 7px; background:rgba(247,249,255,.82); backdrop-filter: blur(24px) saturate(1.25); border-bottom:1px solid rgba(34,48,86,.045); }
-.topbar-title { text-align:center; font-size:18px; font-weight:700; letter-spacing:-.025em; }
 .icon-btn { width:40px; height:40px; border:0; border-radius:50%; display:grid; place-items:center; color:var(--text); background:rgba(255,255,255,.70); box-shadow:0 4px 16px rgba(44,61,102,.07); }
 .icon-btn svg { width:21px; height:21px; }
 .icon-btn:active { transform:scale(.96); background:#eef3ff; }
@@ -2258,7 +2257,6 @@ svg{shape-rendering:geometricPrecision}.nav-icon svg,
 
 /* Typography hierarchy: reserve heavy weight for true milestones and primary numbers. */
 body{font-weight:400}
-.topbar-title{font-weight:600!important}
 .note-kicker{font-weight:600!important}
 .note-workout .day-pill strong,
 .day-pill strong{font-weight:600!important}
@@ -2617,7 +2615,6 @@ html[data-theme="dark"] .note-topbar{
   border-bottom-color:rgba(255,255,255,.10)!important;
   color:var(--ff-dark-text)!important;
 }
-html[data-theme="dark"] .topbar-title,
 html[data-theme="dark"] .topbar .icon-btn,
 html[data-theme="dark"] .topbar .note-icon-btn,
 html[data-theme="dark"] .settings-close.bare-icon-button{color:var(--ff-dark-text)!important}
@@ -3260,7 +3257,7 @@ html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-copy>span{
 
 
 /* === v22 exact uploaded GIF flame + UIKit-like interactive pop === */
-.week-goal-icon .week-goal-fire-gif{
+.week-goal-icon .week-goal-fire-apng{
   display:block!important;
   width:26px!important;
   height:26px!important;
@@ -4188,4 +4185,52 @@ html[data-theme="dark"] .app-feedback-notice.is-accuracy .recovery-reward-badge{
   .brand-splash { transition-duration: 120ms; }
   .brand-splash video { display: none; }
   .brand-splash-final { opacity: 1; transition: none; }
+}
+
+
+/* v35: one shared page canvas, based on the Workout home gradient. */
+:root{
+  --ff-main-page-gradient:
+    radial-gradient(circle at 12% 0%, rgba(255,219,89,.20), transparent 30%),
+    radial-gradient(circle at 100% 14%, rgba(255,135,58,.10), transparent 32%),
+    linear-gradient(180deg,#fffef9 0%,#f7f1e5 100%);
+}
+.screen.note-theme,
+.detail-screen.note-theme,
+.nav-screen.note-theme,
+.note-workout{
+  background:var(--ff-main-page-gradient)!important;
+}
+html[data-theme="dark"]{
+  --ff-main-page-gradient:
+    radial-gradient(circle at 8% -2%,rgba(255,229,92,.055),transparent 28%),
+    radial-gradient(circle at 100% 8%,rgba(53,198,216,.045),transparent 30%),
+    linear-gradient(180deg,#141410 0%,#10100e 100%);
+}
+html[data-theme="dark"] .screen.note-theme,
+html[data-theme="dark"] .detail-screen.note-theme,
+html[data-theme="dark"] .nav-screen.note-theme,
+html[data-theme="dark"] .note-workout{
+  background:var(--ff-main-page-gradient)!important;
+}
+.week-goal-icon .week-goal-fire-apng{
+  display:block!important;
+  width:26px!important;
+  height:26px!important;
+  object-fit:contain!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  image-rendering:auto;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+.week-goal-icon{
+  background:#ffe55c!important;
+  color:#111!important;
+}
+html[data-theme="dark"] .week-goal-icon{
+  background:var(--ff-yellow,#ffe55c)!important;
+  color:#111!important;
 }

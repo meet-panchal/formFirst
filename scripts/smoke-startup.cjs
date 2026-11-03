@@ -69,23 +69,35 @@ try {
   const app = getEl('app');
   if (!app.innerHTML || app.innerHTML.length < 100) throw new Error('Startup completed but #app was not rendered');
   if (!app.innerHTML.includes('note-workout')) throw new Error('Workout homepage markup was not rendered');
+  if (!/class="day-pill active[^"]*" data-day="1"/.test(app.innerHTML)) throw new Error('Fresh startup did not select Day 1');
 
   const initialMarkup = app.innerHTML;
   if (typeof context.selectDay !== 'function') throw new Error('selectDay() is not available to smoke-test day navigation');
+  const initialDay = vm.runInContext('activeDay', context);
 
-  context.selectDay(5);
+  context.selectDay(initialDay);
   if (app.innerHTML !== initialMarkup) {
     throw new Error('Selecting the already-active day re-rendered the workout view');
   }
 
-  context.selectDay(4);
-  if (app.innerHTML === initialMarkup || !app.innerHTML.includes('Day 4')) {
+  vm.runInContext(`DAYS[1].exercises.forEach(ex => { weekBucket()[ex.id] = Array(ex.requiredSets || ex.sets).fill(true); });`, context);
+  if (vm.runInContext('getInitialIncompleteDay()', context) !== 2) {
+    throw new Error('Initial day selection did not skip a completed Day 1');
+  }
+  if (vm.runInContext('getNextDayInSequence(1)', context) !== 2) {
+    throw new Error('Continue flow did not advance to the next incomplete day');
+  }
+
+  const changedDay = initialDay === 5 ? 4 : initialDay + 1;
+  context.selectDay(changedDay);
+  if (app.innerHTML === initialMarkup || !app.innerHTML.includes(`Day ${changedDay}`)) {
     throw new Error('Selecting a different day did not render the new workout day');
   }
 
   if (typeof context.openExercise !== 'function') throw new Error('openExercise() is not available');
-  context.openExercise('d4-shoulder-press');
-  if (!app.innerHTML.includes('detail-screen') || !app.innerHTML.includes('Dumbbell Shoulder Press')) {
+  const testExercise = vm.runInContext('DAYS[activeDay].exercises[0]', context);
+  context.openExercise(testExercise.id);
+  if (!app.innerHTML.includes('detail-screen') || !app.innerHTML.includes(testExercise.name)) {
     throw new Error('Exercise detail did not render');
   }
 
@@ -101,7 +113,7 @@ try {
     throw new Error('Timer view did not render');
   }
 
-  console.log(`PASS startup smoke: homepage, same-day no-op, day change, detail, Progress, and Timer render`);
+  console.log(`PASS startup smoke: Day 1 startup, same-day no-op, day change, detail, Progress, and Timer render`);
 } catch (error) {
   console.error('FAIL startup smoke');
   console.error(error && error.stack || error);

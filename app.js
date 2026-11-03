@@ -561,6 +561,23 @@ function getNextIncompleteExerciseId(exercises, completedSets) {
   return list.find(exercise => !isExerciseCompleteInState(completedSets, exercise))?.id || list[0]?.id || null;
 }
 
+function getFirstIncompleteDay(days, weeklySets = {}) {
+  const ordered = Object.keys(days || {}).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+  return ordered.find(dayNumber => {
+    const stats = calculateDayStats(days[dayNumber], weeklySets);
+    return stats.total > 0 && stats.done < stats.total;
+  }) ?? null;
+}
+
+function getNextIncompleteDay(days, weeklySets = {}, afterDay = 0) {
+  const ordered = Object.keys(days || {}).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+  const incomplete = ordered.filter(dayNumber => {
+    const stats = calculateDayStats(days[dayNumber], weeklySets);
+    return stats.total > 0 && stats.done < stats.total;
+  });
+  return incomplete.find(dayNumber => dayNumber > Number(afterDay)) ?? incomplete[0] ?? null;
+}
+
 /* ===== src/services/geolocation.js ===== */
 const EARTH_RADIUS_METERS = 6_371_000;
 
@@ -986,7 +1003,7 @@ const ICON = {
   back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   settings: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.09a2 2 0 0 1 1 1.74v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.55"/></svg>',
   restart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 8.1A7.7 7.7 0 1 1 4.8 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5.2 4.8v3.7h3.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  flame: '<img class="week-goal-fire-gif" src="./assets/icons8-fire.gif" alt="" aria-hidden="true" draggable="false" />',
+  flame: '<img class="week-goal-fire-apng" src="./assets/icons8-fire-transparent.png" alt="" aria-hidden="true" draggable="false" />',
   chevron: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   play: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m10 8 6 4-6 4Z" fill="currentColor"/></svg>',
   check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -1175,7 +1192,7 @@ function createTimerFeature({
   function render() {
     const progress = progressPercent();
     app.innerHTML = `<main class="screen note-theme nav-screen">
-      <header class="topbar note-topbar workout-topbar"><span class="topbar-spacer" aria-hidden="true"></span><div class="topbar-title">Timer</div><button class="icon-btn note-icon-btn" id="moreBtn" aria-label="Settings">${ICON.settings}</button></header>
+      <header class="topbar note-topbar workout-topbar"><span class="topbar-spacer" aria-hidden="true"></span><span class="topbar-spacer" aria-hidden="true"></span><button class="icon-btn note-icon-btn" id="moreBtn" aria-label="Settings">${ICON.settings}</button></header>
       <div class="container nav-page-container timer-page">
         <section class="timer-note-card">
           <span class="note-kicker">Recovery</span><p>Keep the break intentional, then get back to your next set.</p>
@@ -2030,7 +2047,7 @@ function applyTheme(isDark, animate = true) {
 /* ===== src/app-controller.js ===== */
 const app = document.getElementById('app');
 
-let activeDay = 5;
+let activeDay = 1;
 let exercises = DAYS[activeDay].exercises;
 
 
@@ -2133,6 +2150,15 @@ function doneCount(){ return currentWorkoutStats().done; }
 function totalSets(){ return currentWorkoutStats().total; }
 function percent(){ return currentWorkoutStats().pct; }
 function isDayComplete(dayNumber){ const stats=dayStats(Number(dayNumber)); return stats.total>0 && stats.done>=stats.total; }
+function getInitialIncompleteDay(){
+  const firstIncomplete = getFirstIncompleteDay(DAYS, weekBucket());
+  return firstIncomplete ?? Math.min(...Object.keys(DAYS).map(Number));
+}
+function getNextDayInSequence(afterDay=activeDay){
+  return getNextIncompleteDay(DAYS, weekBucket(), afterDay);
+}
+activeDay = getInitialIncompleteDay();
+exercises = DAYS[activeDay].exercises;
 function completedDaysThisWeek(){ return countCompletedDays(DAYS,weekBucket()); }
 function weekGoalMarkup(){
   const complete=completedDaysThisWeek();
@@ -2182,6 +2208,20 @@ function dayStats(dayNumber){ return calculateDayStats(DAYS[dayNumber],weekBucke
 function nextWorkoutExerciseId(){ return getNextIncompleteExerciseId(exercises,state.completed); }
 
 function continueWorkoutFlow(){
+  if(isDayComplete(activeDay)){
+    const nextDay=getNextDayInSequence(activeDay);
+    if(nextDay){
+      activeDay=nextDay;
+      exercises=DAYS[activeDay].exercises;
+      tabViewState.workout.warmupOpen=false;
+      tabViewState.workout.subview='workout';
+      tabViewState.workout.exerciseId=null;
+      renderWorkout({daySwitch:true});
+    } else {
+      renderWorkout({restore:true});
+      return;
+    }
+  }
   const nextId=nextWorkoutExerciseId();
   if(nextId) openExercise(nextId);
   else renderWorkout({restore:true});
@@ -2319,7 +2359,7 @@ function renderProgress({restoreTabState=false}={}){
   const active=activeGymVisit();
 
   app.innerHTML=`<main class="screen ${restoreTabState?'':'view-enter'} note-theme nav-screen">
-    <header class="topbar note-topbar workout-topbar"><span class="topbar-spacer" aria-hidden="true"></span><div class="topbar-title">Progress</div><button class="icon-btn note-icon-btn" id="moreBtn" aria-label="Settings">${ICON.settings}</button></header>
+    <header class="topbar note-topbar workout-topbar"><span class="topbar-spacer" aria-hidden="true"></span><span class="topbar-spacer" aria-hidden="true"></span><button class="icon-btn note-icon-btn" id="moreBtn" aria-label="Settings">${ICON.settings}</button></header>
     <div class="container nav-page-container progress-hub">
       <section class="nav-hero-card progress-hero-card">
         <div><span class="note-kicker">This week</span><h1>${pct}% complete</h1><p>${done} of ${total} planned working sets finished</p></div>
@@ -2401,7 +2441,7 @@ function renderWorkout({restore=false,daySwitch=false,restoreTabState=false}={})
   app.innerHTML=`<main class="screen ${daySwitch?'day-switch-static':restoreTabState?'':'view-enter'} note-theme note-workout">
     <header class="topbar note-topbar workout-topbar">
       <span class="topbar-spacer" aria-hidden="true"></span>
-      <div class="topbar-title">Form First</div>
+      <span class="topbar-spacer" aria-hidden="true"></span>
       <button class="icon-btn note-icon-btn" id="moreBtn" aria-label="Settings">${ICON.settings}</button>
     </header>
     <div class="container note-workout-container">
@@ -2544,7 +2584,7 @@ function openExercise(id,{restoreTabState=false}={}){
   app.innerHTML=`<div class="edge-back-stage">${underlay}<main class="detail-screen view-enter note-theme">
     <header class="topbar note-topbar">
       <button class="icon-btn note-icon-btn" id="backBtn" aria-label="Back to workout">${ICON.back}</button>
-      <div class="topbar-title">Exercise</div>
+      <span class="topbar-spacer" aria-hidden="true"></span>
       <button class="icon-btn note-icon-btn" id="moreBtn" aria-label="Settings">${ICON.settings}</button>
     </header>
     <div class="detail-content note-detail-content">
@@ -2667,6 +2707,9 @@ function toggleSet(ex,i,btn){
   const nowDayComplete=isDayComplete(activeDay);
   if(arr[i]) celebrateSetCompletion(btn);
   if(arr[i] && nowDayComplete && !wasDayComplete){
+    tabViewState.workout.subview='workout';
+    tabViewState.workout.exerciseId=null;
+    tabViewState.workout.detailScrollY=0;
     celebrateDayCompletion({dayNumber:activeDay,completedDays:completedDaysThisWeek(),totalDays:Object.keys(DAYS).length});
   } else if(arr[i] && nowExerciseComplete && !wasExerciseComplete){
     softHaptic([12,28,18]);

@@ -3,6 +3,8 @@ import {
   calculateWorkoutSetStats,
   countCompletedDays,
   getNextIncompleteExerciseId,
+  getFirstIncompleteDay,
+  getNextIncompleteDay,
   isExerciseCompleteInState
 } from '../src/core/workout-progress.js';
 import {
@@ -45,6 +47,22 @@ assert.equal(getCurrentWeekVisits(visits, reference).length, 3);
 assert.equal(getActiveGymVisit(visits), visits[3]);
 assert.equal(getWeeklyGymMinutes(visits, reference, new Date(2026, 9, 7, 12, 0, 0).getTime()), 150);
 assert.equal(getLatestVisitOnDate(visits, reference), visits[3]);
+
+
+const orderedDays = {
+  1: { exercises: [{ id: 'd1', sets: 1 }] },
+  2: { exercises: [{ id: 'd2', sets: 1 }] },
+  3: { exercises: [{ id: 'd3', sets: 1 }] }
+};
+assert.equal(getFirstIncompleteDay(orderedDays, {}), 1,
+  'A fresh week should start at Day 1');
+const orderedProgress = { d1: [true] };
+assert.equal(getFirstIncompleteDay(orderedDays, orderedProgress), 2,
+  'Initial selection should skip completed days in ascending order');
+assert.equal(getNextIncompleteDay(orderedDays, orderedProgress, 1), 2,
+  'Continue should advance to the next incomplete day');
+assert.equal(getNextIncompleteDay(orderedDays, { d1:[true], d2:[true], d3:[true] }, 2), null,
+  'No next day should be returned when every day is complete');
 
 const zeroDistance = distanceMeters(22.273556, 73.180375, 22.273556, 73.180375);
 assert.ok(Number.isFinite(zeroDistance));
