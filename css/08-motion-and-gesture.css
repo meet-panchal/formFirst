@@ -1,0 +1,246 @@
+/* Interactive iOS-style leading-edge back gesture on exercise detail. */
+.detail-screen.edge-back-dragging{
+  position:relative;
+  z-index:40;
+  will-change:transform;
+  transition:none!important;
+  box-shadow:-18px 0 34px rgba(0,0,0,calc(.16 * var(--edge-back-progress,0)));
+  touch-action:pan-y;
+}
+.detail-screen.edge-back-committing{
+  transition:transform .18s cubic-bezier(.32,.72,0,1)!important;
+  will-change:transform;
+}
+.detail-screen.edge-back-cancelling{
+  transition:transform .22s cubic-bezier(.22,1,.36,1)!important;
+  will-change:transform;
+}
+@media (prefers-reduced-motion:reduce){
+  .detail-screen.edge-back-committing,.detail-screen.edge-back-cancelling{transition:none!important}
+}
+
+
+/* === v22 exact uploaded GIF flame + UIKit-like interactive pop === */
+.week-goal-icon .week-goal-fire-apng{
+  display:block!important;
+  width:26px!important;
+  height:26px!important;
+  object-fit:contain!important;
+  image-rendering:auto;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+.edge-back-stage{
+  --edge-back-progress:0;
+  position:relative;
+  min-height:100dvh;
+  overflow:clip;
+  isolation:isolate;
+}
+.edge-back-underlay{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  pointer-events:none;
+  background:#fffdf6;
+  transform:translate3d(-12vw,0,0);
+  filter:brightness(.90);
+  will-change:transform,filter;
+}
+.edge-back-underlay-content{min-height:100%;background:inherit}
+.edge-back-underlay-header{
+  position:absolute;
+  inset:0 0 auto 0;
+  z-index:4;
+  pointer-events:none;
+}
+.edge-back-underlay-header:empty{display:none}
+.edge-back-underlay-body{
+  min-height:100%;
+  will-change:transform;
+}
+.edge-back-underlay .edge-back-underlay-screen{
+  min-height:100%;
+  animation:none!important;
+  transition:none!important;
+}
+.edge-back-underlay .edge-back-underlay-screen .topbar{display:none!important}
+.edge-back-stage>.detail-screen{
+  position:relative;
+  z-index:2;
+  min-height:100dvh;
+  width:100%;
+  background:#f7f9ff;
+  box-shadow:-16px 0 30px rgba(0,0,0,.18);
+  will-change:transform,box-shadow;
+}
+.edge-back-stage.edge-back-active>.detail-screen,
+.edge-back-stage.edge-back-active>.edge-back-underlay{transition:none!important}
+.edge-back-stage.edge-back-committing>.detail-screen,
+.edge-back-stage.edge-back-cancelling>.detail-screen{
+  transition:transform .23s cubic-bezier(.22,.74,.18,1),box-shadow .23s ease!important;
+}
+.edge-back-stage.edge-back-committing>.edge-back-underlay,
+.edge-back-stage.edge-back-cancelling>.edge-back-underlay{
+  transition:transform .23s cubic-bezier(.22,.74,.18,1),filter .23s ease!important;
+}
+html[data-theme="dark"] .edge-back-underlay,
+html[data-theme="dark"] .edge-back-stage>.detail-screen{
+  background:#11110f;
+}
+@media (prefers-reduced-motion:reduce){
+  .edge-back-stage.edge-back-committing>.detail-screen,
+  .edge-back-stage.edge-back-cancelling>.detail-screen,
+  .edge-back-stage.edge-back-committing>.edge-back-underlay,
+  .edge-back-stage.edge-back-cancelling>.edge-back-underlay{transition:none!important}
+}
+
+/* === v23 transparent flame + iOS-style in-app form browser === */
+body.form-webview-open{overflow:hidden!important;overscroll-behavior:none}
+.form-webview{
+  position:fixed;
+  inset:0;
+  z-index:14000;
+  display:block;
+  background:#000;
+  transform:translate3d(0,100%,0);
+  opacity:.985;
+  transition:transform .30s cubic-bezier(.22,.74,.18,1);
+  will-change:transform;
+}
+.form-webview.is-visible{transform:translate3d(0,0,0)}
+.form-webview-shell{
+  height:100dvh;
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+  background:#f2f2f7;
+  color:#111;
+}
+.form-webview-bar{
+  flex:0 0 auto;
+  min-height:calc(50px + env(safe-area-inset-top));
+  padding:env(safe-area-inset-top) 8px 0;
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr) 64px;
+  align-items:center;
+  border-bottom:1px solid rgba(60,60,67,.22);
+  background:rgba(249,249,249,.96);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+}
+.form-webview-done,
+.form-webview-external{
+  min-width:44px;
+  min-height:44px;
+  border:0;
+  background:transparent;
+  color:#007aff;
+  display:grid;
+  place-items:center;
+  font:600 17px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+.form-webview-done{justify-self:start;padding:0 8px}
+.form-webview-external{justify-self:end;padding:0 8px}
+.form-webview-external svg{width:21px;height:21px;display:block;stroke-width:1.8}
+.form-webview-title{
+  min-width:0;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  pointer-events:none;
+}
+.form-webview-title strong{
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font:600 14px/1.15 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  color:#111;
+}
+.form-webview-title small{
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font:400 10px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  color:#6e6e73;
+}
+.form-webview-content{position:relative;flex:1 1 auto;min-height:0;background:#fff;overflow:hidden}
+.form-webview-frame{display:block;width:100%;height:100%;border:0;background:#fff}
+.form-webview-loading{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  background:#f2f2f7;
+  color:#6e6e73;
+  font:400 13px/1.2 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  transition:opacity .18s ease,visibility .18s ease;
+}
+.form-webview-loading.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.form-webview-spinner{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:2px solid rgba(60,60,67,.18);
+  border-top-color:#8e8e93;
+  animation:formWebViewSpin .72s linear infinite;
+}
+@keyframes formWebViewSpin{to{transform:rotate(360deg)}}
+.form-webview-fallback{
+  position:absolute;
+  left:12px;
+  right:12px;
+  bottom:calc(10px + env(safe-area-inset-bottom));
+  z-index:3;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 10px 9px 12px;
+  border:1px solid rgba(60,60,67,.18);
+  border-radius:14px;
+  background:rgba(249,249,249,.92);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);
+  backdrop-filter:blur(18px) saturate(160%);
+  color:#6e6e73;
+  font:400 11px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  box-shadow:0 6px 24px rgba(0,0,0,.08);
+}
+.form-webview-fallback button{
+  flex:0 0 auto;
+  min-height:34px;
+  border:0;
+  border-radius:10px;
+  padding:0 10px;
+  background:#007aff;
+  color:#fff;
+  font:600 12px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+}
+.form-webview-fallback.is-prominent{border-color:rgba(255,59,48,.28)}
+html[data-theme="dark"] .form-webview-shell{background:#1c1c1e;color:#f2f2f7}
+html[data-theme="dark"] .form-webview-bar{background:rgba(28,28,30,.96);border-bottom-color:rgba(216,211,201,.20)}
+html[data-theme="dark"] .form-webview-title strong{color:#f2f2f7}
+html[data-theme="dark"] .form-webview-title small{color:#98989d}
+html[data-theme="dark"] .form-webview-content,
+html[data-theme="dark"] .form-webview-frame{background:#111}
+html[data-theme="dark"] .form-webview-loading{background:#1c1c1e;color:#98989d}
+html[data-theme="dark"] .form-webview-fallback{background:rgba(44,44,46,.92);border-color:rgba(216,211,201,.18);color:#c7c7cc}
+@media (prefers-reduced-motion:reduce){
+  .form-webview{transition:none!important}
+  .form-webview-spinner{animation:none!important}
+}

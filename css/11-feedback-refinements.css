@@ -1,0 +1,188 @@
+/* === v29 consistent global feedback + check-in interaction lock === */
+.gym-action[disabled],
+.gym-action.is-busy{
+  pointer-events:none!important;
+  cursor:default;
+  touch-action:none;
+}
+.gym-action[aria-busy="true"]{
+  user-select:none;
+  -webkit-user-select:none;
+}
+.app-feedback-notice .recovery-reward-check svg{
+  width:24px;
+  height:24px;
+}
+.app-feedback-notice.is-away .recovery-reward-badge,
+.app-feedback-notice.is-accuracy .recovery-reward-badge{
+  background:#ffd09c;
+}
+.app-feedback-progress .app-feedback-metrics{
+  grid-column:1;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  min-width:0;
+}
+.app-feedback-metrics>div{
+  min-width:0;
+  padding:7px 7px 6px;
+  border:1px solid rgba(17,17,17,.12);
+  border-radius:11px;
+  background:rgba(17,17,17,.035);
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+}
+.app-feedback-metrics small{
+  font-size:8.5px;
+  line-height:1.1;
+  font-weight:700;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+  color:#756e64;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.app-feedback-metrics strong{
+  font-size:11px;
+  line-height:1.2;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+html[data-theme="dark"] .app-feedback-metrics>div{
+  border-color:rgba(216,211,201,.16);
+  background:rgba(216,211,201,.065);
+}
+html[data-theme="dark"] .app-feedback-metrics small{
+  color:var(--ff-dark-secondary,#bcb6ac);
+}
+html[data-theme="dark"] .app-feedback-notice.is-away .recovery-reward-badge,
+html[data-theme="dark"] .app-feedback-notice.is-accuracy .recovery-reward-badge{
+  background:#e7a75f!important;
+}
+@media (max-width:390px){
+  .app-feedback-progress .app-feedback-metrics{gap:5px}
+  .app-feedback-metrics>div{padding:6px 5px 5px}
+  .app-feedback-metrics small{font-size:8px}
+  .app-feedback-metrics strong{font-size:10.5px}
+}
+
+
+/* === v30 unified feedback, stable timer start, and tab-state preservation === */
+/* Failed gym verification uses the same Form First yellow/ink visual language as other system feedback. */
+.app-feedback-notice.is-away .recovery-reward-badge,
+.app-feedback-notice.is-accuracy .recovery-reward-badge,
+html[data-theme="dark"] .app-feedback-notice.is-away .recovery-reward-badge,
+html[data-theme="dark"] .app-feedback-notice.is-accuracy .recovery-reward-badge{
+  background:var(--ff-yellow,#ffe55c)!important;
+  color:#111!important;
+}
+.app-feedback-notice.is-away .recovery-reward-check,
+.app-feedback-notice.is-away .recovery-reward-check svg,
+.app-feedback-notice.is-away .recovery-reward-check svg *,
+.app-feedback-notice.is-accuracy .recovery-reward-check,
+.app-feedback-notice.is-accuracy .recovery-reward-check svg,
+.app-feedback-notice.is-accuracy .recovery-reward-check svg *{
+  color:#111!important;
+  stroke:#111!important;
+}
+
+/* Generic notices use the exact same shell dimensions as timer and gym notices. */
+.app-feedback-generic .app-feedback-generic-body{
+  grid-template-columns:1fr;
+  grid-template-rows:auto;
+  min-height:42px;
+  align-content:center;
+}
+.app-feedback-generic .app-feedback-generic-body.has-action{
+  grid-template-columns:minmax(0,1fr) 132px;
+}
+.app-feedback-generic .app-feedback-generic-body .recovery-reward-next{
+  grid-column:1;
+  font-size:11px;
+  line-height:1.35;
+}
+.app-feedback-generic .app-feedback-generic-body .recovery-reward-action{
+  grid-column:2;
+  grid-row:1;
+}
+
+/* Nothing in the timer number animates outside the intentional final-10-second state. */
+.timer-dial:not(.is-urgent) .timer-dial-content strong{
+  animation:none!important;
+  transform:none!important;
+}
+.timer-dial:not(.is-urgent) .timer-ring-progress{
+  animation:none!important;
+}
+
+/* Returning to a tab restores its state without replaying an entrance animation. */
+.nav-screen:not(.view-enter),
+.note-workout:not(.view-enter){
+  animation:none!important;
+}
+
+/* === v31 failed-location feedback refinement === */
+/* Failure details use readable Title Case instead of all-caps micro labels. */
+.app-feedback-notice.is-away .app-feedback-metrics small,
+.app-feedback-notice.is-accuracy .app-feedback-metrics small{
+  text-transform:none;
+  letter-spacing:0;
+  font-size:9px;
+  font-weight:720;
+}
+/* Failed verification has two useful facts only: no raw GPS-accuracy readout. */
+.app-feedback-notice.is-away .app-feedback-metrics,
+.app-feedback-notice.is-accuracy .app-feedback-metrics{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+/* Try Again is a centered recovery action instead of a right-edge CTA. */
+.app-feedback-notice .app-feedback-progress.is-retry{
+  grid-template-columns:1fr;
+  grid-template-rows:auto auto auto;
+  row-gap:7px;
+}
+.app-feedback-notice .app-feedback-progress.is-retry .app-feedback-metrics{
+  grid-column:1;
+  grid-row:1;
+}
+.app-feedback-notice .app-feedback-progress.is-retry .recovery-reward-next{
+  grid-column:1;
+  grid-row:2;
+  text-align:center;
+}
+.app-feedback-notice .app-feedback-progress.is-retry .recovery-reward-action{
+  grid-column:1;
+  grid-row:3;
+  width:auto;
+  min-width:132px;
+  justify-self:center;
+  justify-content:center;
+  gap:6px;
+  padding-inline:16px;
+}
+.app-feedback-notice .app-feedback-progress.is-retry .recovery-reward-action span{
+  text-align:center;
+}
+.app-feedback-notice .app-feedback-progress.is-retry .recovery-reward-action svg{
+  flex:0 0 auto;
+}
+
+/* === v32 location feedback, stable timer start, and workout-detail tab restoration === */
+/* Failure feedback shows the two diagnostic values the user actually asked for. */
+.app-feedback-notice.is-away .app-feedback-metrics,
+.app-feedback-notice.is-accuracy .app-feedback-metrics{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+/* Starting the countdown must not animate the readout/ring before the first real tick. */
+.timer-dial.timer-start-stable .timer-dial-content strong,
+.timer-dial.timer-start-stable .timer-ring-progress{
+  animation:none!important;
+  transition:none!important;
+  transform:none!important;
+}

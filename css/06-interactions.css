@@ -1,0 +1,647 @@
+/* === iOS interaction layer · Form First === */
+:root{
+  --ios-spring:cubic-bezier(.22,1,.36,1);
+  --ios-snappy:cubic-bezier(.2,.8,.2,1);
+  --ios-press:cubic-bezier(.16,1,.3,1);
+}
+.screen.view-enter{animation:iosPageIn .42s var(--ios-spring) both;transform-origin:50% 35%}
+@keyframes iosPageIn{from{opacity:0;transform:translate3d(0,12px,0) scale(.992)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+.nav-hero-card,
+.progress-metric,
+.day-block-card,
+.progress-feature-card,
+.note-card{will-change:transform,opacity}
+.progress-hero-card{animation:iosCardRise .5s var(--ios-spring) both}
+.progress-metric:nth-child(1){animation:iosCardRise .46s .04s var(--ios-spring) both}
+.progress-metric:nth-child(2){animation:iosCardRise .46s .08s var(--ios-spring) both}
+.progress-metric:nth-child(3){animation:iosCardRise .46s .12s var(--ios-spring) both}
+.progress-metric:nth-child(4){animation:iosCardRise .46s .16s var(--ios-spring) both}
+.ios-card-enter{animation:iosCardRise .5s .2s var(--ios-spring) both}
+@keyframes iosCardRise{from{opacity:0;transform:translate3d(0,16px,0) scale(.985)}to{opacity:1;transform:none}}
+
+button,
+.day-exercise-row,
+.day-pill,
+.nav-item,
+.check-btn,
+.icon-btn{transition:transform .22s var(--ios-press),filter .2s ease,background-color .2s ease,border-color .2s ease,box-shadow .25s var(--ios-spring)}
+button:active,
+.day-exercise-row:active,
+.day-pill:active,
+.nav-item:active,
+.icon-btn:active{transform:scale(.965)}
+.day-exercise-row:active{transform:scale(.985)}
+
+.ios-tabbar{-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px)}
+.nav-item .nav-icon{transition:transform .36s var(--ios-spring)}
+.nav-item.active .nav-icon{animation:iosTabBounce .48s var(--ios-spring)}
+@keyframes iosTabBounce{0%{transform:scale(.82)}55%{transform:scale(1.13)}100%{transform:scale(1)}}
+.nav-icon svg,
+.button-icon svg,
+.chip-icon svg,
+.biometric-icon svg,
+.form-picker-close svg,
+.form-picker-arrow svg,
+.watch-form-arrow svg{width:1em;height:1em;display:block}
+
+.form-picker-backdrop{animation:iosFadeIn .22s ease both}
+.form-picker{animation:iosSheetUp .46s var(--ios-spring) both}
+@keyframes iosFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes iosSheetUp{from{transform:translate3d(0,32px,0) scale(.985);opacity:.6}to{transform:none;opacity:1}}
+.form-picker-close{display:grid;place-items:center}.form-picker-close svg{width:18px;height:18px}
+.form-picker-arrow,
+.watch-form-arrow{display:grid;place-items:center}.form-picker-arrow svg,
+.watch-form-arrow svg{width:18px;height:18px}
+.wg-arrow svg{width:22px;height:22px}
+
+.gym-actions .gym-action{display:flex;align-items:center;justify-content:center;gap:9px}
+.button-icon{display:inline-grid;place-items:center;font-size:19px;flex:0 0 auto}
+.button-icon svg{width:19px;height:19px}
+.privacy-chip{display:inline-flex;align-items:center;gap:5px}.chip-icon{display:inline-grid;font-size:14px}.chip-icon svg{width:14px;height:14px}
+.biometric-strip{display:flex;align-items:center;gap:12px;padding:12px 13px;margin:12px 0;border:1.5px solid var(--ink,#111);border-radius:16px;background:rgba(255,255,255,.32)}
+.biometric-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--highlight,#f5d84c);border:1.5px solid var(--ink,#111);flex:0 0 auto}
+.biometric-icon svg{width:24px;height:24px}
+.biometric-strip>div{min-width:0;display:grid;gap:2px}.biometric-strip strong{font-size:14px;line-height:1.15}.biometric-strip small{font-size:11px;line-height:1.35;opacity:.72}
+.faceid-action .button-icon{animation:faceIdIdle 2.8s ease-in-out infinite}
+.face-scan{animation:faceIdScan .9s var(--ios-spring) infinite!important}
+@keyframes faceIdIdle{0%,
+82%,
+100%{transform:scale(1)}88%{transform:scale(1.12)}94%{transform:scale(.98)}}
+@keyframes faceIdScan{0%,
+100%{transform:scale(.88);opacity:.6}50%{transform:scale(1.12);opacity:1}}
+.button-spinner{width:18px;height:18px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:iosSpin .7s linear infinite}
+@keyframes iosSpin{to{transform:rotate(360deg)}}
+
+
+.check-btn.just-done{animation:iosCheckPop .48s var(--ios-spring)}
+@keyframes iosCheckPop{0%{transform:scale(.75)}55%{transform:scale(1.2)}100%{transform:scale(1)}}
+.set-progress-track i,
+.section-progress-rail i{transition:width .55s var(--ios-spring)}
+
+.timer-actions button{display:flex;align-items:center;justify-content:center;gap:8px}
+.timer-actions .button-icon{font-size:18px}
+
+@media (prefers-reduced-motion:reduce){
+  .screen.view-enter,
+.progress-hero-card,
+.progress-metric,
+.ios-card-enter,
+.form-picker-backdrop,
+.form-picker,
+.nav-item.active .nav-icon,
+.faceid-action .button-icon,
+.face-scan,
+.check-btn.just-done{animation:none!important}
+  *,
+*::before,
+*::after{scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
+
+
+/* User-requested interaction refinements */
+.gym-actions-single { grid-template-columns: 1fr !important; }
+.gym-action.is-checked-in {
+  cursor: pointer;
+}
+
+/* === refinement: static day switching, gated set logging, tighter page bottoms === */
+.day-switch-static,
+.day-switch-static * {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+.day-switch-static .day-pill:active { transform: none !important; }
+
+/* Set logging is available only during an active verified gym visit. */
+.log-sets-section.is-locked .compact-set-card {
+  opacity: .56;
+}
+.log-sets-section.is-locked .input-wrap,
+.log-sets-section.is-locked .check-btn {
+  filter: saturate(.45);
+}
+.log-sets-section.is-locked input:disabled,
+.log-sets-section.is-locked .check-btn:disabled {
+  cursor: not-allowed;
+  -webkit-text-fill-color: currentColor;
+  opacity: .62;
+}
+
+
+/* Remove duplicate page-bottom spacing while preserving clearance for the fixed tab bar. */
+body { padding-bottom: 0 !important; }
+.note-workout-container,
+.nav-page-container,
+.note-detail-content {
+  padding-bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 10px) !important;
+}
+
+/* === Progress-first gamification + native-feeling workout feedback === */
+/* Day completion is persistent for the active week and deliberately tiny. */
+.day-pill{position:relative;overflow:visible}
+.day-pill.day-complete{padding-right:21px}
+.day-complete-mark{
+  position:absolute;right:5px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;border-radius:50%;display:grid;place-items:center;
+  background:#111;color:#ffe55c;border:1px solid #111;
+}
+.day-complete-mark svg{width:9px;height:9px;stroke-width:3}
+.day-pill.active.day-complete .day-complete-mark{background:#fffdf6;color:#111}
+
+/* Warm-up opens/closes with a short iOS-style spring. Figure remains spatially anchored. */
+.warmup-flow{transition:transform .38s var(--ios-spring),background-color .3s ease!important;will-change:transform}
+.warmup-details{
+  opacity:0;transform:translate3d(0,-7px,0) scale(.99);
+  transition:max-height .42s var(--ios-spring),margin-top .42s var(--ios-spring),padding-top .42s var(--ios-spring),opacity .24s ease,transform .42s var(--ios-spring)!important;
+  transform-origin:top center;
+}
+.warmup.open .warmup-details{opacity:1;transform:none}
+@keyframes warmupSpringOpen{0%{transform:scale(.992)}58%{transform:scale(1.008)}100%{transform:scale(1)}}
+@keyframes warmupSpringClose{0%{transform:scale(1)}48%{transform:scale(.994)}100%{transform:scale(1)}}
+
+/* Exercise-level progress is the main game loop: complete the next set, then the exercise. */
+@keyframes exerciseMilestone{0%{transform:scale(.985)}52%{transform:scale(1.018)}100%{transform:scale(1)}}
+
+/* Completing a set rewards the exact row the user just acted on. */
+.set-line.set-earned{animation:setEarned .55s var(--ios-spring)}
+.set-line.set-earned .set-index{animation:setIndexBounce .52s var(--ios-spring)}
+@keyframes setEarned{0%{background:transparent;transform:scale(.992)}42%{background:rgba(255,229,92,.34);transform:scale(1.006)}100%{background:transparent;transform:scale(1)}}
+@keyframes setIndexBounce{0%{transform:scale(.9)}55%{transform:scale(1.1)}100%{transform:scale(1)}}
+
+/* Brief session-complete reward; no modal or extra tap required. */
+.workout-celebration{position:fixed;inset:0;z-index:250;pointer-events:none;display:grid;place-items:center;background:rgba(255,255,255,.01);animation:celebrationFade .24s ease both}
+.celebration-badge{
+  min-width:176px;padding:18px 20px;border-radius:24px;background:rgba(28,28,30,.91);color:#fff;
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:0 18px 50px rgba(0,0,0,.24);display:grid;justify-items:center;gap:4px;
+  animation:celebrationBadge .7s var(--ios-spring) both;
+}
+.celebration-badge>svg{width:34px;height:34px;padding:7px;border-radius:50%;background:#ffe55c;color:#111;margin-bottom:4px}
+.celebration-badge strong{font-size:15px;letter-spacing:-.01em}.celebration-badge small{font-size:10.5px;opacity:.65;font-weight:750}
+.workout-celebration.is-leaving{animation:celebrationOut .36s ease both}
+@keyframes celebrationBadge{0%{opacity:0;transform:scale(.78) translateY(10px)}55%{opacity:1;transform:scale(1.04) translateY(0)}100%{transform:scale(1)}}
+@keyframes rewardParticle{0%{opacity:0;transform:rotate(calc(var(--i)*36deg)) translateY(-16px) scale(.5)}35%{opacity:1}100%{opacity:0;transform:rotate(calc(var(--i)*36deg)) translateY(-88px) scale(1)}}
+@keyframes celebrationFade{from{opacity:0}to{opacity:1}}@keyframes celebrationOut{to{opacity:0;transform:scale(.98)}}
+
+@media (prefers-reduced-motion:reduce){
+  .warmup-flow,
+.warmup-details,
+.set-line.set-earned,
+.set-line.set-earned .set-index,
+.workout-celebration,
+.celebration-badge{animation:none!important;transition:none!important}
+}
+
+/* Settings sheet + development mode */
+.settings-overlay{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.18);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .22s ease}
+.settings-overlay.show{opacity:1}.settings-sheet{width:min(100%,540px);background:rgba(249,248,244,.97);border-radius:24px 24px 0 0;padding:8px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -18px 55px rgba(0,0,0,.14);transform:translateY(22px);transition:transform .38s cubic-bezier(.22,1,.36,1)}
+.settings-overlay.show .settings-sheet{transform:translateY(0)}.settings-grabber{width:36px;height:5px;border-radius:999px;background:rgba(60,60,67,.28);margin:0 auto 12px}.settings-header{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 14px}.settings-header h2{margin:2px 0 0;font-size:28px;letter-spacing:-.03em}.settings-close{width:32px;height:32px;border:0;border-radius:50%;background:rgba(120,120,128,.12);display:grid;place-items:center;color:#555}.settings-close svg{width:17px;height:17px}.settings-group{background:#fff;border-radius:18px;overflow:hidden;border:1px solid rgba(0,0,0,.05)}.settings-row{min-height:72px;display:flex;align-items:center;gap:16px;padding:13px 14px}.settings-row-copy{flex:1;display:flex;flex-direction:column;gap:3px}.settings-row-copy strong{font-size:15px}.settings-row-copy small{font-size:12px;line-height:1.35;color:#777168;max-width:34ch}.ios-switch{width:51px;height:31px;border:0;border-radius:999px;padding:2px;background:#d1d1d6;transition:background .2s ease;flex:0 0 auto}.ios-switch span{display:block;width:27px;height:27px;border-radius:50%;background:white;box-shadow:0 2px 5px rgba(0,0,0,.22);transform:translateX(0);transition:transform .22s cubic-bezier(.22,1,.36,1)}.ios-switch.is-on{background:#34c759}.ios-switch.is-on span{transform:translateX(20px)}.settings-dev-note{font-size:12px;line-height:1.4;color:#79736a;padding:10px 6px 0}.dev-mode-caption{color:#a06a00!important}.log-sets-section.is-locked .set-card{opacity:.56}
+
+/* === iOS polish pass: unobtrusive feedback, true sheet motion, confetti, icon normalization === */
+
+/* Settings behaves like an iOS modal sheet: full slide up, full slide down. */
+.settings-overlay{
+  background:rgba(0,0,0,0);
+  transition:background-color .30s ease,opacity .30s ease!important;
+  opacity:1!important;
+  pointer-events:none;
+}
+.settings-overlay .settings-sheet{
+  transform:translate3d(0,100%,0)!important;
+  opacity:.98;
+  transition:transform .42s cubic-bezier(.32,.72,0,1),opacity .24s ease!important;
+  will-change:transform;
+}
+.settings-overlay.show{background:rgba(0,0,0,.20);pointer-events:auto}
+.settings-overlay.show .settings-sheet{transform:translate3d(0,0,0)!important;opacity:1}
+.settings-overlay.closing{background:rgba(0,0,0,0);pointer-events:none}
+.settings-overlay.closing .settings-sheet{transform:translate3d(0,100%,0)!important;opacity:.96}
+
+/* iMessage-inspired celebration: confetti falls from the top and clears itself. */
+.workout-celebration.imessage-confetti{
+  display:block;
+  overflow:hidden;
+  background:transparent;
+}
+@keyframes imessageConfettiFall{
+  0%{opacity:0;transform:translate3d(0,-30px,0) rotate(var(--rot))}
+  8%{opacity:1}
+  100%{opacity:.92;transform:translate3d(var(--drift),105vh,0) rotate(calc(var(--rot) + 760deg))}
+}
+.imessage-confetti .celebration-badge{
+  position:absolute;
+  left:50%;top:46%;
+  transform:translate(-50%,-50%);
+  animation:imessageBadgeIn .62s var(--ios-spring) both;
+}
+@keyframes imessageBadgeIn{
+  from{opacity:0;transform:translate(-50%,calc(-50% + 14px)) scale(.84)}
+  60%{opacity:1;transform:translate(-50%,-50%) scale(1.04)}
+  to{transform:translate(-50%,-50%) scale(1)}
+}
+.workout-celebration.imessage-confetti.is-leaving{animation:celebrationOut .42s ease both}
+
+/* Timer preset changes are intentionally static; only the values update. */
+.timer-presets button,
+.timer-presets button.active,
+.timer-dial,
+.timer-dial::after{
+  animation:none!important;
+  transition:none!important;
+  transform:none!important;
+}
+
+/* Normalize all inline system icons so strokes never distort between controls. */
+.icon-btn svg,
+.nav-icon svg,
+.button-icon svg,
+.chip-icon svg,
+.biometric-icon svg,
+.settings-close svg,
+.form-picker-close svg,
+.form-picker-arrow svg,
+.watch-form-arrow svg,
+.day-complete-mark svg,
+.check-btn svg,
+.day-exercise-number svg{
+  display:block;
+  overflow:visible;
+  vector-effect:non-scaling-stroke;
+  shape-rendering:geometricPrecision;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.note-icon-btn{
+  width:34px!important;
+  height:34px!important;
+  min-width:34px!important;
+  padding:7px!important;
+  display:grid!important;
+  place-items:center!important;
+}
+.note-icon-btn svg{width:20px!important;height:20px!important}
+.topbar-spacer{width:34px;min-width:34px}
+
+@media (prefers-reduced-motion:reduce){
+  .settings-overlay,
+.settings-overlay .settings-sheet,
+.imessage-confetti .celebration-badge,{animation:none!important;transition:none!important}
+}
+
+
+/* === Duolingo-inspired motivation + iOS visual cleanup === */
+.screen.view-enter,
+.detail-screen.view-enter{animation:none!important;transform:none!important}
+.screen.view-enter>:not(.topbar),
+.detail-screen.view-enter>:not(.topbar){animation:iosPageContentIn .38s var(--ios-spring) both}
+@keyframes iosPageContentIn{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:none}}
+.day-switch-static>:not(.topbar){animation:none!important;transition:none!important}
+.topbar .icon-btn,
+.topbar .note-icon-btn,
+.settings-close.bare-icon-button{width:36px!important;height:36px!important;min-width:36px!important;padding:7px!important;border:0!important;border-radius:10px!important;background:transparent!important;box-shadow:none!important;color:#111!important}
+.topbar .icon-btn:active,
+.topbar .note-icon-btn:active,
+.settings-close.bare-icon-button:active{transform:scale(.9)!important;background:rgba(120,120,128,.10)!important;box-shadow:none!important}
+.topbar .icon-btn svg,
+.topbar .note-icon-btn svg{width:22px!important;height:22px!important}.topbar-spacer{width:36px!important;min-width:36px!important}
+svg{shape-rendering:geometricPrecision}.nav-icon svg,
+.button-icon svg,
+.chip-icon svg,
+.biometric-icon svg,
+.form-picker-close svg,
+.form-picker-arrow svg,
+.watch-form-arrow svg,
+.day-complete-mark svg,
+.check-btn svg,
+.day-exercise-number svg,
+.settings-action-icon svg,
+.settings-action-chevron svg{vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.week-goal{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:10px;margin:2px 0 12px;padding:9px 10px;border-radius:14px;background:rgba(255,255,255,.44);border:1px solid rgba(17,17,17,.12)}
+.week-goal-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#ffe55c;color:#111}.week-goal-icon svg{width:20px;height:20px}.week-goal-copy{display:grid;gap:1px;min-width:0}.week-goal-copy small{font-size:9.5px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:#756e64}.week-goal-copy strong{font-size:12.5px;line-height:1.15}.week-goal-dots{display:flex;align-items:center;gap:4px}.week-goal-dots i{width:7px;height:7px;border-radius:50%;background:rgba(17,17,17,.13);transition:transform .28s var(--ios-spring),background-color .2s ease}.week-goal-dots i.done{background:#111;transform:scale(1.08)}.week-goal.is-complete{background:rgba(255,229,92,.28);border-color:rgba(17,17,17,.22)}
+.workout-celebration.imessage-confetti{position:fixed;inset:0;z-index:250;pointer-events:none;display:block;overflow:hidden;background:transparent}.confetti-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}.imessage-confetti .celebration-badge{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);animation:imessageBadgeIn .62s var(--ios-spring) both}.workout-celebration.imessage-confetti.is-leaving{animation:celebrationOut .48s ease both}.settings-action-row{width:100%;min-height:76px;border:0;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;text-align:left;color:#111}.settings-action-row:active{background:rgba(120,120,128,.08);transform:none}.settings-action-row.destructive .settings-row-copy strong{color:#d70015}.settings-action-icon{width:32px;height:32px;display:grid;place-items:center;color:#d70015;flex:0 0 auto}.settings-action-icon svg{width:22px;height:22px}.settings-action-chevron{display:grid;place-items:center;color:#aaa49b}.settings-action-chevron svg{width:16px;height:16px}.week-reset-confirm{padding:14px;border-top:1px solid rgba(17,17,17,.08);opacity:0;transform:translateY(6px);transition:opacity .18s ease,transform .22s var(--ios-spring)}.week-reset-confirm.show{opacity:1;transform:none}.week-reset-copy{display:grid;gap:4px}.week-reset-copy strong{font-size:15px}.week-reset-copy small{font-size:12px;line-height:1.38;color:#777168}.week-reset-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}.week-reset-actions button{min-height:42px;border:0;border-radius:12px;font:inherit;font-size:13px;font-weight:850}.week-reset-cancel{background:rgba(120,120,128,.12);color:#111}.week-reset-go{background:#d70015;color:white}
+@media(prefers-reduced-motion:reduce){.screen.view-enter>:not(.topbar),
+.detail-screen.view-enter>:not(.topbar),
+.week-goal-dots i,
+.week-reset-confirm,
+.imessage-confetti .celebration-badge{animation:none!important;transition:none!important}}
+
+/* Final icon cleanup: system symbols stand on their own; no decorative borders/boxes. */
+.nav-item .nav-icon,
+.nav-item.active .nav-icon{
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+.nav-item.active .nav-icon{color:#111!important}
+.nav-item .nav-icon{color:inherit}
+.biometric-icon{
+  border:0!important;
+  box-shadow:none!important;
+}
+
+
+/* === Duolingo-motion refinement + iOS typography/tab bar === */
+/* Give the weekly goal room to breathe below working-set status. */
+.note-summary-card .week-goal{margin-top:13px!important;margin-bottom:12px!important}
+
+/* Native iOS-style tab bar: tint communicates selection; no underline, pill, border, or bounce. */
+.note-bottom-nav{
+  border-top:1px solid rgba(60,60,67,.16)!important;
+  box-shadow:0 -1px 0 rgba(255,255,255,.55)!important;
+  background:rgba(250,249,246,.92)!important;
+  -webkit-backdrop-filter:saturate(180%) blur(22px);
+  backdrop-filter:saturate(180%) blur(22px);
+}
+.nav-item{
+  color:#8e8e93!important;
+  gap:2px!important;
+  border-radius:0!important;
+  font-size:10px!important;
+  font-weight:500!important;
+  letter-spacing:0!important;
+  transition:color .16s ease,opacity .16s ease!important;
+}
+.nav-item.active{color:#007aff!important;font-weight:600!important}
+.nav-item::after,
+.nav-item.active::after{content:none!important;display:none!important}
+.nav-item .nav-icon,
+.nav-item.active .nav-icon{
+  width:28px!important;height:27px!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  animation:none!important;transform:none!important;transition:none!important;
+}
+.nav-item .nav-icon svg{width:22px!important;height:22px!important;stroke-width:1.8}
+.nav-item:active{transform:none!important;opacity:.58}
+
+/* Duolingo-like confirmation motion: quick squash, overshoot, settle. */
+.check-btn.just-done{animation:duoCheckReward .48s cubic-bezier(.2,1.55,.38,1)!important;transform-origin:center}
+.set-line.set-earned{animation:duoSetReward .50s cubic-bezier(.2,.9,.25,1)!important}
+.set-line.set-earned .set-index{animation:duoIndexReward .46s cubic-bezier(.2,1.5,.38,1)!important}
+@keyframes duoCheckReward{
+  0%{transform:scale(1)}
+  22%{transform:scale(.82,1.12)}
+  52%{transform:scale(1.17,.91)}
+  76%{transform:scale(.97,1.04)}
+  100%{transform:scale(1)}
+}
+@keyframes duoSetReward{
+  0%{background:transparent;transform:translateY(0) scale(1)}
+  38%{background:rgba(88,204,2,.10);transform:translateY(-1px) scale(1.004)}
+  100%{background:transparent;transform:translateY(0) scale(1)}
+}
+@keyframes duoIndexReward{0%{transform:scale(1)}45%{transform:scale(1.10)}100%{transform:scale(1)}}
+.set-confetti-canvas{position:fixed;inset:0;z-index:1320;pointer-events:none;width:100%;height:100%;display:block}
+
+/* Typography hierarchy: reserve heavy weight for true milestones and primary numbers. */
+body{font-weight:400}
+.note-kicker{font-weight:600!important}
+.note-workout .day-pill strong,
+.day-pill strong{font-weight:600!important}
+.primary-btn,
+.compact-start-btn{font-weight:600!important}
+.summary-progress-copy h2,
+.warmup-detail-name,
+.detail-section h2{font-weight:650!important}
+.summary-set-status{font-weight:500!important}
+.summary-set-count{font-weight:650!important}
+.week-goal-copy small{font-weight:600!important}
+.week-goal-copy strong{font-weight:600!important}
+.section-game-copy,
+.section-game-copy strong,
+.section-game-status{font-weight:600!important}
+.progress-metric small{font-weight:600!important}
+.progress-metric strong{font-weight:700!important}
+.progress-metric p,
+.timer-note-card>p{font-weight:400!important}
+.timer-dial small{font-weight:600!important}
+.timer-presets button,
+.gym-actions button{font-weight:600!important}
+.settings-row-copy strong,
+.week-reset-copy strong{font-weight:600!important}
+.settings-row-copy small,
+.week-reset-copy small,
+.settings-dev-note{font-weight:400!important}
+.week-reset-actions button{font-weight:600!important}
+
+@media(prefers-reduced-motion:reduce){
+  .check-btn.just-done,
+.set-line.set-earned,
+.set-line.set-earned .set-index{animation:none!important}
+  .set-confetti-canvas{display:none!important}
+}
+
+
+/* === Micro-polish: quiet set logging, text-only warm-up reveal, synced iOS sheet === */
+/* Warm-up card itself stays still; only the hidden copy slides/fades in and out. */
+.warmup-flow,
+.warmup.open .warmup-flow{
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+  will-change:auto!important;
+}
+.warmup-details{
+  transform:translate3d(0,-8px,0)!important;
+  opacity:0;
+  transition:max-height .36s cubic-bezier(.25,.8,.25,1),margin-top .36s cubic-bezier(.25,.8,.25,1),padding-top .36s cubic-bezier(.25,.8,.25,1),opacity .20s ease,transform .32s cubic-bezier(.25,.8,.25,1)!important;
+}
+.warmup.open .warmup-details{transform:translate3d(0,0,0)!important;opacity:1}
+
+/* Yellow text labels deliberately use a consistent bold weight. */
+.note-kicker,
+.warmup-label,
+.note-workout .day-pill.active strong,
+.summary-set-count,
+.timer-presets button.active,
+.log-watch-form-btn{font-weight:700!important}
+
+/* Gym attendance micro-typography. */
+.gym-card .privacy-chip{font-size:10.5px!important;padding:6px 9px!important;font-weight:700!important}
+.gym-card .privacy-chip .chip-icon svg{width:15px!important;height:15px!important}
+.gym-card .progress-card-head h2{font-weight:400!important}
+
+/* Backdrop blur/dim and sheet translation resolve on the exact same close curve. */
+.settings-overlay{
+  background:rgba(0,0,0,0)!important;
+  -webkit-backdrop-filter:blur(0px)!important;
+  backdrop-filter:blur(0px)!important;
+  transition:background-color .42s cubic-bezier(.32,.72,0,1),-webkit-backdrop-filter .42s cubic-bezier(.32,.72,0,1),backdrop-filter .42s cubic-bezier(.32,.72,0,1)!important;
+}
+.settings-overlay.show{
+  background:rgba(0,0,0,.20)!important;
+  -webkit-backdrop-filter:blur(2px)!important;
+  backdrop-filter:blur(2px)!important;
+}
+.settings-overlay.closing{
+  background:rgba(0,0,0,0)!important;
+  -webkit-backdrop-filter:blur(0px)!important;
+  backdrop-filter:blur(0px)!important;
+}
+.settings-overlay .settings-sheet{transition:transform .42s cubic-bezier(.32,.72,0,1),opacity .42s cubic-bezier(.32,.72,0,1)!important}
+
+@media(prefers-reduced-motion:reduce){
+  .warmup-details,
+.settings-overlay,
+.settings-overlay .settings-sheet{transition:none!important}
+}
+
+
+/* === Water reminders + tighter native tab bar === */
+/* Yellow labels: one step stronger, while body typography stays restrained. */
+.note-kicker,
+.warmup-label,
+.note-workout .day-pill.active strong,
+.summary-set-count,
+.timer-presets button.active,
+.log-watch-form-btn{font-weight:800!important}
+
+/* Slightly larger symbols inside a shorter iOS-style tab bar. */
+:root{--bottom-nav-h:62px}
+.note-bottom-nav{
+  min-height:calc(var(--bottom-nav-h) + var(--safe-bottom))!important;
+  padding:4px 10px calc(5px + var(--safe-bottom))!important;
+  gap:2px!important;
+}
+.nav-item{
+  min-height:48px!important;
+  gap:1px!important;
+  font-size:9.5px!important;
+  line-height:1.1!important;
+}
+.nav-item .nav-icon,
+.nav-item.active .nav-icon{width:30px!important;height:28px!important}
+.nav-item .nav-icon svg{width:24px!important;height:24px!important}
+
+
+/* === Doodle navigation + concise Settings pass === */
+:root{--bottom-nav-h:58px}
+.note-bottom-nav{
+  min-height:calc(var(--bottom-nav-h) + var(--safe-bottom))!important;
+  padding:3px 12px calc(4px + var(--safe-bottom))!important;
+  gap:10px!important;
+  align-items:center!important;
+}
+.nav-item{
+  min-height:50px!important;
+  gap:0!important;
+  padding:0!important;
+  font-size:0!important;
+  line-height:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  overflow:visible;
+}
+.nav-item > span:not(.nav-icon){display:none!important}
+.nav-item .nav-icon,
+.nav-item.active .nav-icon{
+  width:40px!important;
+  height:40px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  display:grid!important;
+  place-items:center!important;
+  transform:none!important;
+  transition:opacity .16s ease,filter .16s ease!important;
+}
+.nav-item .nav-icon svg{width:38px!important;height:38px!important;overflow:visible!important}
+
+
+
+.nav-item.active::after{display:none!important;content:none!important}
+
+/* Keep the doodles crisp and intentionally hand-drawn, without UI chrome. */
+
+
+
+/* Settings: shorter sheet, less copy, same iOS sheet behavior. */
+.settings-sheet{padding:7px 15px calc(14px + env(safe-area-inset-bottom))!important}
+.settings-grabber{margin-bottom:8px!important}
+.settings-header{padding:0 1px 8px!important}
+.settings-header h2{margin:0!important;font-size:25px!important;font-weight:700!important;letter-spacing:-.025em!important}
+.settings-group{border-radius:16px!important}
+.settings-row{min-height:62px!important;padding:10px 13px!important;gap:12px!important}
+.settings-row-copy{gap:2px!important}
+.settings-row-copy strong{font-size:14px!important}
+.settings-row-copy small{font-size:11.5px!important;line-height:1.3!important;max-width:31ch!important}
+.settings-dev-note{padding:7px 5px 0!important;font-size:11px!important;line-height:1.32!important}
+.settings-action-row{min-height:64px!important;padding:10px 13px!important}
+.week-reset-confirm{padding:12px 13px!important}
+
+/* === Check-in gate + live weekly flame === */
+.log-gate-card{
+  width:100%;
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr) 18px;
+  align-items:center;
+  gap:11px;
+  margin:0 0 12px;
+  padding:12px 13px;
+  border:1px solid rgba(17,17,17,.10);
+  border-radius:16px;
+  background:rgba(255,229,92,.28);
+  color:#111;
+  text-align:left;
+  font:inherit;
+  -webkit-tap-highlight-color:transparent;
+}
+.log-gate-card:active{background:rgba(255,229,92,.40)}
+.log-gate-icon{
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;
+  background:#ffe55c;color:#111;
+}
+.log-gate-icon svg{width:20px;height:20px}
+.log-gate-copy{display:grid;gap:2px;min-width:0}
+.log-gate-copy strong{font-size:13px;line-height:1.2;font-weight:700}
+.log-gate-copy small{font-size:11px;line-height:1.3;font-weight:400;color:#746d63}
+.log-gate-chevron{display:grid;place-items:center;color:#8a8379}
+.log-gate-chevron svg{width:15px;height:15px}
+
+.week-goal-icon{overflow:visible!important;background:transparent!important}
+
+
+
+
+
+
+
+
+
+
+/* === Weekly flame box + Development Mode notification test === */
+.week-goal-icon{
+  width:34px!important;
+  height:34px!important;
+  border-radius:11px!important;
+  display:grid!important;
+  place-items:center!important;
+  background:#ffe55c!important;
+  color:#111!important;
+  overflow:visible!important;
+}
+
+.test-notification-btn{
+  width:100%;
+  min-height:42px;
+  margin-top:10px;
+  border:1px solid rgba(17,17,17,.12);
+  border-radius:13px;
+  background:rgba(255,255,255,.72);
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font:inherit;
+  font-size:13px;
+  font-weight:600;
+  -webkit-tap-highlight-color:transparent;
+}
+.test-notification-btn .button-icon{width:19px;height:19px;display:grid;place-items:center}
+.test-notification-btn .button-icon svg{width:19px;height:19px}
+.test-notification-btn:active{background:rgba(17,17,17,.06)}
+.test-notification-btn.is-sent{background:rgba(255,229,92,.30)}

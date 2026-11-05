@@ -1,0 +1,143 @@
+/* === v24 clean nav artwork + seamless flame + Duolingo-inspired smooth timer === */
+/* The replacement navigation assets are original SVGs; no raster watermarked artwork ships in the app. */
+.nav-item .nav-icon.supplied-nav-icon img{
+  width:35px;
+  height:35px;
+  image-rendering:auto;
+}
+.nav-item[data-nav="timer"] .nav-icon.supplied-nav-icon img{width:34px;height:34px}
+
+/* Smooth determinate countdown: continuous ring motion with a quick, playful number pop per second. */
+.timer-dial{
+  background:transparent!important;
+  isolation:isolate;
+  overflow:visible;
+}
+.timer-dial::after{
+  inset:12px!important;
+  z-index:0!important;
+  box-shadow:inset 0 0 0 1px rgba(17,17,17,.045);
+}
+.timer-ring{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:1;
+  overflow:visible;
+  transform:rotate(-90deg);
+  pointer-events:none;
+}
+.timer-ring-track,
+.timer-ring-progress{
+  fill:none;
+  stroke-width:8;
+}
+.timer-ring-track{stroke:#e9e1d2}
+.timer-ring-progress{
+  stroke:#111;
+  stroke-linecap:round;
+  will-change:stroke-dashoffset;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.28));
+}
+.timer-dial-content{
+  position:relative;
+  z-index:2;
+  display:grid;
+  place-items:center;
+  gap:3px;
+}
+.timer-dial strong{
+  display:block;
+  transform-origin:50% 55%;
+  will-change:transform;
+}
+.timer-dial.timer-tick strong{
+  animation:duoTimerTick .32s cubic-bezier(.2,1.55,.35,1) both!important;
+}
+.timer-dial.is-urgent .timer-ring-progress{
+  stroke:#ff9500;
+  animation:duoTimerUrgent .72s ease-in-out infinite alternate!important;
+}
+@keyframes duoTimerTick{
+  0%{transform:translateY(0) scale(1)}
+  44%{transform:translateY(-1px) scale(1.085)}
+  70%{transform:translateY(.5px) scale(.985)}
+  100%{transform:translateY(0) scale(1)}
+}
+@keyframes duoTimerUrgent{
+  from{filter:drop-shadow(0 0 0 rgba(255,149,0,0));stroke-width:8}
+  to{filter:drop-shadow(0 0 6px rgba(255,149,0,.34));stroke-width:9}
+}
+html[data-theme="dark"] .timer-ring-track{stroke:#39362f!important}
+html[data-theme="dark"] .timer-ring-progress{stroke:var(--ff-yellow)!important;filter:none}
+html[data-theme="dark"] .timer-dial.is-urgent .timer-ring-progress{stroke:#ff9f0a!important}
+html[data-theme="dark"] .timer-dial::after{box-shadow:inset 0 0 0 1px rgba(216,211,201,.06)}
+
+@media (prefers-reduced-motion:reduce){
+  .timer-dial.timer-tick strong,
+  .timer-dial.is-urgent .timer-ring-progress{animation:none!important}
+}
+
+
+/* === v26 timer reliability + completion UX === */
+/* Keep one real countdown ring. The previous dark theme's conic background had higher
+   specificity than the newer timer rule, which created a second ring behind the SVG. */
+.timer-dial,
+html[data-theme="dark"] .timer-dial{
+  background:transparent!important;
+  isolation:isolate;
+}
+.timer-dial::after,
+html[data-theme="dark"] .timer-dial::after{
+  background:var(--timer-face,#fbf7ee)!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+html[data-theme="dark"] .timer-dial::after{--timer-face:var(--ff-dark-surface)}
+
+.timer-note-card .note-kicker{
+  display:inline-flex;
+  margin-bottom:10px;
+}
+.timer-note-card > p{
+  margin-top:0!important;
+}
+
+.timer-ring-track,
+.timer-ring-progress{
+  fill:none;
+  stroke-width:8;
+}
+.timer-ring-track{stroke:#e9e1d2}
+.timer-ring-progress{
+  stroke:#111;
+  stroke-linecap:round;
+  will-change:stroke-dashoffset;
+}
+html[data-theme="dark"] .timer-ring-track{stroke:#39362f!important}
+html[data-theme="dark"] .timer-ring-progress{stroke:var(--ff-yellow)!important;filter:none!important}
+
+/* Dark mode uses one visible countdown stroke only. */
+html[data-theme="dark"] .timer-ring-track{stroke:transparent!important}
+
+/* === v27 timer state recovery + global reward feedback === */
+/* A single determinate track: same geometry for track and progress, so it reads as one ring. */
+html[data-theme="dark"] .timer-ring-track{
+  stroke:rgba(216,211,201,.34)!important;
+}
+html[data-theme="dark"] .timer-ring-progress{
+  stroke:var(--ff-yellow)!important;
+}
+.timer-actions .button-icon{
+  width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+}
+.timer-actions .button-icon svg{
+  width:20px;
+  height:20px;
+  display:block;
+}

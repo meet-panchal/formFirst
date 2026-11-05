@@ -1,0 +1,726 @@
+/* === Dark Mode rebuild: audited from the last stable light build === */
+:root{
+  --ff-yellow:#ffe55c;
+  --ff-dark-bg:#11110f;
+  --ff-dark-surface:#1c1b18;
+  --ff-dark-surface-2:#24221e;
+  --ff-dark-surface-3:#2b2924;
+  --ff-dark-text:#f7f4ed;
+  --ff-dark-secondary:#b9b2a7;
+  --ff-dark-tertiary:#8f887f;
+  --ff-dark-line:#3a3731;
+  --ff-dark-line-soft:rgba(255,255,255,.10);
+}
+
+/* Theme toggle: custom, vector-only, and isolated from the app's normal motion. */
+.appearance-row{min-height:58px!important}
+.theme-toggle{
+  width:72px;height:36px;min-width:72px;padding:0;border:0;border-radius:999px;
+  background:transparent;position:relative;flex:0 0 auto;-webkit-tap-highlight-color:transparent;
+}
+.theme-toggle-track{
+  position:absolute;inset:0;overflow:hidden;border-radius:999px;
+  background:linear-gradient(135deg,#3fd0dd 0%,#2eb7c8 100%);
+  box-shadow:inset 0 0 0 1px rgba(17,17,17,.13),0 2px 8px rgba(32,146,160,.16);
+  transition:background .32s ease,box-shadow .32s ease;
+}
+.theme-toggle-track::before{
+  content:"";position:absolute;width:52px;height:52px;border-radius:50%;right:-19px;top:-23px;
+  background:rgba(255,255,255,.16);transform:scale(.92);transition:transform .38s cubic-bezier(.22,1,.36,1),opacity .25s ease;
+}
+.theme-toggle-orb{
+  position:absolute;left:3px;top:3px;width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(145deg,#17191a,#050606);
+  box-shadow:0 3px 8px rgba(0,0,0,.28),inset 0 0 0 1px rgba(255,255,255,.07);
+  transform:translate3d(0,0,0);
+  transition:transform .44s cubic-bezier(.2,1.25,.36,1),box-shadow .28s ease;
+}
+.theme-sun,
+.theme-moon{position:absolute;inset:1.5px;width:27px;height:27px;transition:opacity .18s ease,transform .38s cubic-bezier(.2,1.18,.36,1)}
+.theme-sun{opacity:1;transform:rotate(0deg) scale(1)}
+.theme-moon{opacity:0;transform:rotate(-38deg) scale(.58)}
+.theme-stars i{position:absolute;width:2.5px;height:2.5px;border-radius:50%;background:#d7fbff;opacity:0;transform:scale(.25);transition:opacity .2s ease,transform .4s cubic-bezier(.2,1.3,.36,1)}
+.theme-stars i:nth-child(1){left:13px;top:8px}.theme-stars i:nth-child(2){left:20px;top:17px;width:2px;height:2px}.theme-stars i:nth-child(3){left:12px;top:25px;width:2px;height:2px}
+.theme-toggle.is-dark .theme-toggle-track{background:linear-gradient(135deg,#34bfd0,#237f90)}
+.theme-toggle.is-dark .theme-toggle-track::before{transform:scale(1.16);opacity:.07}
+.theme-toggle.is-dark .theme-toggle-orb{transform:translate3d(36px,0,0);box-shadow:0 4px 10px rgba(0,0,0,.36),inset 0 0 0 1px rgba(255,255,255,.05)}
+.theme-toggle.is-dark .theme-sun{opacity:0;transform:rotate(46deg) scale(.52)}
+.theme-toggle.is-dark .theme-moon{opacity:1;transform:rotate(0deg) scale(1)}
+.theme-toggle.is-dark .theme-stars i{opacity:.9;transform:scale(1)}
+.theme-toggle:active .theme-toggle-orb{scale:.94}
+
+/* Only theme colors transition. Existing workout/navigation animations stay untouched. */
+html.theme-changing body,
+html.theme-changing .screen,
+html.theme-changing .detail-screen,
+html.theme-changing .note-theme,
+html.theme-changing .note-workout,
+html.theme-changing .nav-screen,
+html.theme-changing .topbar,
+html.theme-changing .note-bottom-nav,
+html.theme-changing .note-summary-card,
+html.theme-changing .note-group-card,
+html.theme-changing .day-block-card,
+html.theme-changing .day-block-head,
+html.theme-changing .note-card,
+html.theme-changing .compact-set-card,
+html.theme-changing .progress-feature-card,
+html.theme-changing .progress-metric,
+html.theme-changing .nav-hero-card,
+html.theme-changing .timer-note-card,
+html.theme-changing .settings-sheet,
+html.theme-changing .settings-group{
+  transition:background-color .28s ease,color .28s ease,border-color .28s ease,box-shadow .28s ease!important;
+}
+
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:var(--ff-dark-bg);
+  --surface:rgba(28,27,24,.96);
+  --surface-solid:var(--ff-dark-surface);
+  --surface-subtle:var(--ff-dark-surface-2);
+  --text:var(--ff-dark-text);
+  --secondary:var(--ff-dark-secondary);
+  --tertiary:var(--ff-dark-tertiary);
+  --line:var(--ff-dark-line-soft);
+  --line-strong:rgba(255,255,255,.20);
+  --shadow:0 14px 38px rgba(0,0,0,.32),0 2px 8px rgba(0,0,0,.22);
+}
+html[data-theme="dark"] body{background:var(--ff-dark-bg)!important;color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .screen,
+html[data-theme="dark"] .detail-screen,
+html[data-theme="dark"] .note-theme,
+html[data-theme="dark"] .note-workout,
+html[data-theme="dark"] .nav-screen{
+  background:
+    radial-gradient(circle at 8% -2%,rgba(255,229,92,.055),transparent 28%),
+    radial-gradient(circle at 100% 8%,rgba(53,198,216,.045),transparent 30%),
+    linear-gradient(180deg,#141410 0%,#10100e 100%)!important;
+  color:var(--ff-dark-text)!important;
+}
+
+/* Static chrome */
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .note-topbar{
+  background:rgba(17,17,15,.88)!important;
+  border-bottom-color:rgba(255,255,255,.10)!important;
+  color:var(--ff-dark-text)!important;
+}
+html[data-theme="dark"] .topbar .icon-btn,
+html[data-theme="dark"] .topbar .note-icon-btn,
+html[data-theme="dark"] .settings-close.bare-icon-button{color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .topbar .icon-btn:active,
+html[data-theme="dark"] .topbar .note-icon-btn:active,
+html[data-theme="dark"] .settings-close.bare-icon-button:active{background:rgba(255,255,255,.08)!important}
+
+/* Surfaces: preserve the Notes-inspired hierarchy without bright flashes. */
+html[data-theme="dark"] .note-summary-card,
+html[data-theme="dark"] .summary-card,
+html[data-theme="dark"] .note-group-card,
+html[data-theme="dark"] .group-card,
+html[data-theme="dark"] .day-block-card,
+html[data-theme="dark"] .day-block-head,
+html[data-theme="dark"] .note-card,
+html[data-theme="dark"] .target-card,
+html[data-theme="dark"] .reading-card,
+html[data-theme="dark"] .compact-set-card,
+html[data-theme="dark"] .set-card,
+html[data-theme="dark"] .step,
+html[data-theme="dark"] .nav-hero-card,
+html[data-theme="dark"] .progress-feature-card,
+html[data-theme="dark"] .progress-metric,
+html[data-theme="dark"] .timer-note-card,
+html[data-theme="dark"] .gym-live-status{
+  background:var(--ff-dark-surface)!important;
+  border-color:var(--ff-dark-line)!important;
+  color:var(--ff-dark-text)!important;
+  box-shadow:4px 4px 0 rgba(0,0,0,.24)!important;
+}
+html[data-theme="dark"] .caution-card{background:#2a2518!important;border-color:#4b4325!important;color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .edge-to-edge{background:#24231f!important;border-color:var(--ff-dark-line)!important}
+html[data-theme="dark"] .edge-to-edge img{filter:brightness(.94) saturate(.96)}
+
+/* Primary text */
+html[data-theme="dark"] .note-workout-header h1,
+html[data-theme="dark"] .day-block-heading-row h2,
+html[data-theme="dark"] .day-exercise-row,
+html[data-theme="dark"] .day-exercise-copy strong,
+html[data-theme="dark"] .summary-row h2,
+html[data-theme="dark"] .detail-heading h1,
+html[data-theme="dark"] .detail-section h2,
+html[data-theme="dark"] .note-heading .detail-meta,
+html[data-theme="dark"] .note-detail-meta,
+html[data-theme="dark"] .target-copy strong,
+html[data-theme="dark"] .reading-card p,
+html[data-theme="dark"] .caution-card p,
+html[data-theme="dark"] .note-bullet-list li,
+html[data-theme="dark"] .compact-input input,
+html[data-theme="dark"] .set-prescription strong,
+html[data-theme="dark"] .summary-set-status,
+html[data-theme="dark"] .summary-set-count,
+html[data-theme="dark"] .section-game-copy strong,
+html[data-theme="dark"] .section-game-status,
+html[data-theme="dark"] .week-goal-copy strong,
+html[data-theme="dark"] .nav-hero-card h1,
+html[data-theme="dark"] .progress-card-head h2,
+html[data-theme="dark"] .progress-metric strong,
+html[data-theme="dark"] .timer-note-card h1,
+html[data-theme="dark"] .timer-dial strong{
+  color:var(--ff-dark-text)!important;
+}
+
+/* Secondary text */
+html[data-theme="dark"] .day-block-heading-row p,
+html[data-theme="dark"] .day-exercise-meta,
+html[data-theme="dark"] .day-exercise-copy small,
+html[data-theme="dark"] .summary-row p,
+html[data-theme="dark"] .detail-meta,
+html[data-theme="dark"] .target-copy p,
+html[data-theme="dark"] .section-caption,
+html[data-theme="dark"] .set-index small,
+html[data-theme="dark"] .compact-input span,
+html[data-theme="dark"] .set-prescription span,
+html[data-theme="dark"] .section-game-row,
+html[data-theme="dark"] .week-goal-copy small,
+html[data-theme="dark"] .nav-hero-card p,
+html[data-theme="dark"] .progress-metric small,
+html[data-theme="dark"] .progress-metric strong span,
+html[data-theme="dark"] .progress-metric p,
+html[data-theme="dark"] .gym-live-status small,
+html[data-theme="dark"] .timer-note-card>p,
+html[data-theme="dark"] .timer-dial small{
+  color:var(--ff-dark-secondary)!important;
+}
+html[data-theme="dark"] .day-exercise-meta span:not(:last-child)::after{color:#716b63!important}
+
+/* Warm-up: dark surface + illustration, with readable copy. */
+html[data-theme="dark"] .warmup-flow{
+  background-image:
+    linear-gradient(90deg,rgba(28,27,24,.995) 0%,rgba(28,27,24,.98) 38%,rgba(28,27,24,.91) 54%,rgba(28,27,24,.60) 67%,rgba(28,27,24,.16) 79%,rgba(28,27,24,0) 100%),
+    var(--warmup-figure, url("../assets/warmup/upper-body-mobility-cutout-cropped.webp"))!important;
+  background-color:var(--ff-dark-surface)!important;
+}
+html[data-theme="dark"] .warmup-heading{color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .warmup-intro,
+html[data-theme="dark"] .warmup-details{color:var(--ff-dark-secondary)!important}
+html[data-theme="dark"] .warmup.open .warmup-details{border-top-color:rgba(255,255,255,.12)!important}
+
+/* Day controls and progress */
+html[data-theme="dark"] .note-workout .day-pill,
+html[data-theme="dark"] .timer-presets button,
+html[data-theme="dark"] .secondary-timer-btn{
+  background:var(--ff-dark-surface-2)!important;
+  color:var(--ff-dark-text)!important;
+  border-color:#47433c!important;
+  box-shadow:none!important;
+}
+html[data-theme="dark"] .note-workout .day-pill:not(.active){opacity:.82!important}
+html[data-theme="dark"] .note-workout .day-pill.active,
+html[data-theme="dark"] .timer-presets button.active{
+  background:var(--ff-yellow)!important;color:#111!important;border-color:#111!important;
+}
+html[data-theme="dark"] .day-complete-mark{background:var(--ff-yellow)!important;color:#111!important;border-color:#111!important}
+html[data-theme="dark"] .day-block-card.section-complete .day-block-head{background:radial-gradient(circle at 100% 0%,rgba(255,229,92,.10),transparent 46%),var(--ff-dark-surface)!important}
+html[data-theme="dark"] .day-block-card.section-complete .section-game-status{background:var(--ff-yellow)!important;color:#111!important;border-color:#111!important}
+html[data-theme="dark"] .day-block-card.section-complete .section-progress-rail{background:#3c3932!important;border-color:#514c43!important}
+html[data-theme="dark"] .section-progress-rail{background:#34312b!important;border-color:#47433c!important}
+html[data-theme="dark"] .section-progress-rail i{background:var(--ff-yellow)!important}
+
+/* Logging */
+html[data-theme="dark"] .compact-input,
+html[data-theme="dark"] .input-wrap,
+html[data-theme="dark"] .set-prescription{
+  background:var(--ff-dark-surface-2)!important;
+  border-color:#4a463f!important;
+  color:var(--ff-dark-text)!important;
+}
+html[data-theme="dark"] .compact-input input,
+html[data-theme="dark"] .input-wrap input{color:var(--ff-dark-text)!important;-webkit-text-fill-color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .compact-input span,
+html[data-theme="dark"] .input-wrap span{color:#aaa398!important}
+html[data-theme="dark"] input::placeholder{color:#837d73!important;opacity:1}
+html[data-theme="dark"] .compact-set-line+.compact-set-line{border-color:rgba(255,255,255,.10)!important}
+html[data-theme="dark"] .check-btn{background:#2a2823!important;border-color:#504b43!important;color:var(--ff-dark-text)!important;box-shadow:none!important}
+html[data-theme="dark"] .check-btn.done{background:var(--ff-yellow)!important;border-color:#111!important;color:#111!important}
+html[data-theme="dark"] .check-dot{background:currentColor!important}
+html[data-theme="dark"] .log-watch-form-btn{background:#2b2820!important;color:var(--ff-yellow)!important;border-color:#514a39!important;box-shadow:none!important}
+html[data-theme="dark"] .summary-set-status,
+html[data-theme="dark"] .set-progress-chip{background:#26241f!important;border-color:#454139!important;box-shadow:none!important}
+html[data-theme="dark"] .summary-set-status.is-complete,
+html[data-theme="dark"] .set-progress-chip.is-complete{background:var(--ff-yellow)!important;color:#111!important;border-color:#111!important}
+html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-copy,
+html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-copy strong{color:#111!important}
+html[data-theme="dark"] .log-gate-card{background:rgba(255,229,92,.14)!important;border-color:rgba(255,229,92,.34)!important;color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .log-gate-card:active{background:rgba(255,229,92,.20)!important}
+html[data-theme="dark"] .log-gate-copy strong{color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .log-gate-copy small,
+html[data-theme="dark"] .log-gate-chevron{color:var(--ff-dark-secondary)!important}
+html[data-theme="dark"] .log-gate-icon{background:var(--ff-yellow)!important;color:#111!important}
+
+/* Primary actions */
+html[data-theme="dark"] .note-summary-card .primary-btn,
+html[data-theme="dark"] .primary-timer-btn,
+html[data-theme="dark"] .gym-action.primary{
+  background:var(--ff-yellow)!important;color:#111!important;border-color:#111!important;box-shadow:none!important;
+}
+html[data-theme="dark"] .note-summary-card .progress-ring{background:conic-gradient(var(--ff-yellow) var(--progress),#39362f 0)!important}
+html[data-theme="dark"] .note-summary-card .progress-ring::after,
+html[data-theme="dark"] .nav-progress-ring::after,
+html[data-theme="dark"] .timer-dial::after{background:var(--ff-dark-surface)!important}
+html[data-theme="dark"] .nav-progress-ring{background:conic-gradient(var(--ff-yellow) var(--progress),#39362f 0)!important}
+html[data-theme="dark"] .timer-dial{background:conic-gradient(var(--ff-yellow) var(--timer-progress),#39362f 0)!important}
+
+/* Weekly goal retains the recognizable yellow flame tile. */
+html[data-theme="dark"] .week-goal{background:#211f1a!important;border-color:#3c3932!important}
+html[data-theme="dark"] .week-goal.is-complete{background:rgba(255,229,92,.12)!important;border-color:rgba(255,229,92,.34)!important}
+html[data-theme="dark"] .week-goal-icon{background:var(--ff-yellow)!important;color:#111!important}
+html[data-theme="dark"] .week-goal-dots i{background:#4a463f!important}
+html[data-theme="dark"] .week-goal-dots i.done{background:var(--ff-yellow)!important}
+
+/* Progress / attendance */
+html[data-theme="dark"] .privacy-chip{background:#27251f!important;color:var(--ff-dark-text)!important;border-color:#4a463f!important}
+html[data-theme="dark"] .gym-status-dot{background:var(--ff-dark-surface)!important;border-color:#8d867b!important}
+html[data-theme="dark"] .gym-live-status.is-active{border-color:rgba(255,229,92,.46)!important}
+html[data-theme="dark"] .gym-live-status.is-active .gym-status-dot{background:var(--ff-yellow)!important;border-color:var(--ff-yellow)!important}
+
+/* Target / instruction details */
+html[data-theme="dark"] .step p{color:#d8d3ca!important}
+html[data-theme="dark"] .target-muscle-image{background:#26241f!important}
+
+/* Bottom navigation: no new chrome; keep doodles readable on dark material. */
+html[data-theme="dark"] .note-bottom-nav{
+  background:rgba(16,16,14,.94)!important;
+  border-top-color:rgba(255,255,255,.12)!important;
+  box-shadow:0 -8px 24px rgba(0,0,0,.30)!important;
+}
+html[data-theme="dark"] .nav-item{color:#8f887e!important}
+html[data-theme="dark"] .nav-item.active{color:var(--ff-dark-text)!important}
+
+
+
+
+/* Settings sheet: explicit text colors prevent inherited light-theme grays disappearing. */
+html[data-theme="dark"] .settings-overlay.show{background:rgba(0,0,0,.42)!important}
+html[data-theme="dark"] .settings-overlay.closing{background:rgba(0,0,0,0)!important}
+html[data-theme="dark"] .settings-sheet{background:rgba(25,24,21,.985)!important;color:var(--ff-dark-text)!important;box-shadow:0 -22px 65px rgba(0,0,0,.52)!important}
+html[data-theme="dark"] .settings-grabber{background:rgba(235,235,245,.28)!important}
+html[data-theme="dark"] .settings-header h2,
+html[data-theme="dark"] .settings-row-copy strong,
+html[data-theme="dark"] .week-reset-copy strong{color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .settings-row-copy small,
+html[data-theme="dark"] .settings-dev-note,
+html[data-theme="dark"] .week-reset-copy small{color:#aca59b!important}
+html[data-theme="dark"] .settings-group{background:#22211d!important;border-color:rgba(255,255,255,.08)!important;box-shadow:none!important}
+html[data-theme="dark"] .settings-row+ .settings-row{border-color:rgba(255,255,255,.08)!important}
+html[data-theme="dark"] .ios-switch{background:#3a3a3c!important}
+html[data-theme="dark"] .ios-switch.is-on{background:#30d158!important}
+html[data-theme="dark"] .ios-switch span{background:#f4f4f4!important}
+html[data-theme="dark"] .settings-action-row{color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .settings-action-row:active{background:rgba(255,255,255,.06)!important}
+html[data-theme="dark"] .settings-action-chevron{color:#777169!important}
+html[data-theme="dark"] .week-reset-confirm{border-top-color:rgba(255,255,255,.09)!important}
+html[data-theme="dark"] .week-reset-cancel{background:rgba(118,118,128,.28)!important;color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .week-reset-go{background:#ff453a!important;color:#fff!important}
+
+/* Picker / test notification */
+html[data-theme="dark"] .form-picker{background:#1c1b18!important;color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .form-picker-handle{background:#565149!important}
+html[data-theme="dark"] .form-picker-head strong{color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .form-picker-head small{color:var(--ff-dark-secondary)!important}
+html[data-theme="dark"] .form-picker-close,
+html[data-theme="dark"] .form-picker-option{background:#28261f!important;color:var(--ff-dark-text)!important;border-color:#4a463f!important}
+html[data-theme="dark"] .form-picker-option small{color:var(--ff-dark-secondary)!important}
+html[data-theme="dark"] .test-notification-btn{background:#27251f!important;color:var(--ff-dark-text)!important;border-color:#47433c!important}
+html[data-theme="dark"] .test-notification-btn:active{background:#302d26!important}
+html[data-theme="dark"] .test-notification-btn.is-sent{background:rgba(255,229,92,.16)!important;color:var(--ff-dark-text)!important}
+
+/* Yellow labels always keep dark ink for contrast and consistency. */
+html[data-theme="dark"] .note-kicker,
+html[data-theme="dark"] .warmup-label,
+html[data-theme="dark"] .note-workout .day-pill.active,
+html[data-theme="dark"] .timer-presets button.active,
+html[data-theme="dark"] .day-complete-mark{color:#111!important}
+
+/* Disabled controls remain legible instead of fading into the surface. */
+html[data-theme="dark"] button:disabled,
+html[data-theme="dark"] input:disabled{opacity:.58}
+html[data-theme="dark"] .log-sets-section.is-locked .set-card{opacity:.72!important}
+
+@media(prefers-reduced-motion:reduce){
+  .theme-toggle-track,
+.theme-toggle-track::before,
+.theme-toggle-orb,
+.theme-sun,
+.theme-moon,
+.theme-stars i{transition:none!important}
+  html.theme-changing body,
+html.theme-changing .screen,
+html.theme-changing .detail-screen,
+html.theme-changing .note-theme,
+html.theme-changing .note-workout,
+html.theme-changing .nav-screen,
+html.theme-changing .topbar,
+html.theme-changing .note-bottom-nav{transition:none!important}
+}
+
+/* === Final dark-mode visibility audit: remaining legacy text/surface selectors === */
+html[data-theme="dark"] .movement-credit{color:var(--ff-dark-secondary)!important}
+html[data-theme="dark"] .movement-credit{background:#1a1916!important;border-top-color:rgba(255,255,255,.09)!important}
+html[data-theme="dark"] .warmup-detail-name{color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .wg-arrow{background:#28261f!important;color:var(--ff-dark-text)!important;border-color:#4a463f!important}
+html[data-theme="dark"] .wg-movement-pair{background:linear-gradient(180deg,#22201c 0%,#1b1a17 100%)!important}
+html[data-theme="dark"] .day-exercise-list{background:var(--ff-dark-surface)!important}
+html[data-theme="dark"] .day-block-count{background:var(--ff-yellow)!important;color:#111!important;border-color:#111!important}
+html[data-theme="dark"] .dev-mode-caption{color:#f3bd4b!important}
+html[data-theme="dark"] .set-progress-track{background:#34312b!important;border-color:#514c43!important}
+html[data-theme="dark"] .set-progress-track i{background:var(--ff-yellow)!important}
+html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-track{background:#3b3831!important;border-color:#5d574d!important}
+html[data-theme="dark"] .day-exercise-row.is-complete .day-exercise-copy strong{color:#d4cfc6!important}
+html[data-theme="dark"] .day-exercise-chevron{color:#a8a196!important}
+html[data-theme="dark"] .day-exercise-row:active{background:rgba(255,229,92,.055)!important}
+html[data-theme="dark"] .celebration-badge{background:#25231f!important;color:var(--ff-dark-text)!important;border-color:#4a463f!important}
+html[data-theme="dark"] .celebration-badge>svg{color:var(--ff-yellow)!important}
+
+/* Contrast fixes found in the full-screen audit. */
+html[data-theme="dark"] .summary-set-count{color:#111!important}
+html[data-theme="dark"] .set-progress-copy>span{color:var(--ff-dark-secondary)!important}
+html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-copy>span{color:#111!important}
+
+/* Light-mode legibility polish surfaced by the comparison audit. */
+.settings-dev-note{color:#6f695f!important}
+.dev-mode-caption{color:#875900!important}
+html[data-theme="dark"] .settings-dev-note{color:#aca59b!important}
+html[data-theme="dark"] .dev-mode-caption{color:#f3bd4b!important}
+
+/* === Dark-mode refinement pass: borders, day/night toggle, destructive action === */
+:root{
+  --ff-dark-contrast-border:#d8d3c9;
+  --ff-dark-destructive:#ff5147;
+}
+
+/* The light theme uses strong black outlines as a visual motif. In dark mode,
+   mirror that motif with a warm off-white outline instead of leaving black edges. */
+html[data-theme="dark"] .note-summary-card,
+html[data-theme="dark"] .summary-card,
+html[data-theme="dark"] .note-group-card,
+html[data-theme="dark"] .group-card,
+html[data-theme="dark"] .day-block-card,
+html[data-theme="dark"] .day-block-head,
+html[data-theme="dark"] .note-card,
+html[data-theme="dark"] .target-card,
+html[data-theme="dark"] .reading-card,
+html[data-theme="dark"] .compact-set-card,
+html[data-theme="dark"] .set-card,
+html[data-theme="dark"] .step,
+html[data-theme="dark"] .nav-hero-card,
+html[data-theme="dark"] .progress-feature-card,
+html[data-theme="dark"] .progress-metric,
+html[data-theme="dark"] .timer-note-card,
+html[data-theme="dark"] .gym-live-status,
+html[data-theme="dark"] .edge-to-edge,
+html[data-theme="dark"] .compact-input,
+html[data-theme="dark"] .check-btn,
+html[data-theme="dark"] .note-detail-meta span,
+html[data-theme="dark"] .day-pill,
+html[data-theme="dark"] .timer-presets button,
+html[data-theme="dark"] .privacy-chip,
+html[data-theme="dark"] .gym-action,
+html[data-theme="dark"] .log-watch-form-btn,
+html[data-theme="dark"] .log-gate-card,
+html[data-theme="dark"] .set-progress-chip,
+html[data-theme="dark"] .summary-set-status,
+html[data-theme="dark"] .week-goal,
+html[data-theme="dark"] .wg-arrow,
+html[data-theme="dark"] .form-picker,
+html[data-theme="dark"] .form-picker-close,
+html[data-theme="dark"] .form-picker-option,
+html[data-theme="dark"] .test-notification-btn,
+html[data-theme="dark"] .biometric-strip,
+html[data-theme="dark"] .biometric-icon,
+html[data-theme="dark"] .day-block-count,
+html[data-theme="dark"] .section-game-status{
+  border-color:var(--ff-dark-contrast-border)!important;
+}
+
+/* Borders that are individual edges in the light theme. */
+html[data-theme="dark"] .workout-topbar,
+html[data-theme="dark"] .note-topbar{
+  border-color:var(--ff-dark-contrast-border)!important;
+}
+html[data-theme="dark"] .movement-figure,
+html[data-theme="dark"] .edge-to-edge{
+  border-top-color:var(--ff-dark-contrast-border)!important;
+  border-bottom-color:var(--ff-dark-contrast-border)!important;
+}
+
+/* Completed yellow controls keep dark ink but use the same dark-mode outline language. */
+html[data-theme="dark"] .check-btn.done,
+html[data-theme="dark"] .set-progress-chip.is-complete,
+html[data-theme="dark"] .note-summary-card .primary-btn,
+html[data-theme="dark"] .primary-timer-btn,
+html[data-theme="dark"] .gym-action.primary,
+html[data-theme="dark"] .day-block-card.section-complete .section-game-status,
+html[data-theme="dark"] .day-block-count{
+  border-color:var(--ff-dark-contrast-border)!important;
+}
+
+/* Day → night toggle. The sky crossfades, clouds drift away, stars emerge,
+   and the celestial glyph changes inside the moving orb. */
+.theme-toggle-track{
+  background:linear-gradient(180deg,#68d9ea 0%,#36bfd5 60%,#2cacc3 100%);
+  box-shadow:inset 0 0 0 1px rgba(17,17,17,.12),0 2px 8px rgba(32,146,160,.16);
+  transition:box-shadow .42s ease;
+}
+.theme-toggle-track::before{
+  content:"";
+  position:absolute;inset:0;border-radius:inherit;
+  width:auto;height:auto;right:auto;top:auto;
+  background:linear-gradient(180deg,#182442 0%,#172238 52%,#12192d 100%);
+  opacity:0;transform:none;
+  transition:opacity .48s cubic-bezier(.22,.61,.36,1);
+}
+.theme-toggle-track::after{
+  content:"";position:absolute;left:0;right:0;bottom:-8px;height:21px;
+  background:linear-gradient(180deg,rgba(255,200,112,.28),rgba(255,151,94,0));
+  opacity:0;transform:translateY(4px);
+  transition:opacity .32s ease,transform .48s cubic-bezier(.22,.61,.36,1);
+}
+.theme-toggle.is-dark .theme-toggle-track{background:linear-gradient(180deg,#68d9ea 0%,#36bfd5 60%,#2cacc3 100%)}
+.theme-toggle.is-dark .theme-toggle-track::before{opacity:1;transform:none}
+.theme-toggle.is-dark .theme-toggle-track::after{opacity:.42;transform:translateY(-3px)}
+.theme-cloud{position:absolute;z-index:1;height:5px;border-radius:999px;background:rgba(255,255,255,.78);filter:blur(.1px);transition:opacity .32s ease,transform .48s cubic-bezier(.22,.61,.36,1)}
+.theme-cloud::before,
+.theme-cloud::after{content:"";position:absolute;border-radius:50%;background:inherit}
+.theme-cloud::before{width:7px;height:7px;left:4px;bottom:1px}.theme-cloud::after{width:5px;height:5px;left:10px;bottom:1px}
+.theme-cloud-a{width:18px;left:36px;top:8px;opacity:.72}.theme-cloud-b{width:14px;left:43px;top:21px;opacity:.52;transform:scale(.84)}
+.theme-toggle.is-dark .theme-cloud-a{opacity:0;transform:translate(10px,-5px) scale(.84)}
+.theme-toggle.is-dark .theme-cloud-b{opacity:0;transform:translate(8px,4px) scale(.72)}
+.theme-stars{position:absolute;inset:0;z-index:2;pointer-events:none}
+.theme-stars i{background:#f4fbff;box-shadow:0 0 3px rgba(214,241,255,.62);z-index:2}
+.theme-stars i:nth-child(1){left:10px;top:8px}.theme-stars i:nth-child(2){left:19px;top:17px}.theme-stars i:nth-child(3){left:9px;top:26px}.theme-stars i:nth-child(4){left:26px;top:7px;width:1.8px;height:1.8px}
+.theme-toggle-orb{z-index:3;background:linear-gradient(145deg,#1a1d1f,#050606);transition:transform .50s cubic-bezier(.22,1.12,.36,1),box-shadow .32s ease}
+.theme-sun,
+.theme-moon{inset:1.5px;width:27px;height:27px;transform-origin:50% 50%}
+.theme-sun{opacity:1;transform:translateY(0) rotate(0deg) scale(1);transition:opacity .22s ease,transform .48s cubic-bezier(.22,.61,.36,1)}
+.theme-moon{opacity:0;transform:translateY(7px) rotate(-18deg) scale(.72);transition:opacity .26s .04s ease,transform .50s cubic-bezier(.22,1.08,.36,1)}
+.theme-toggle.is-dark .theme-sun{opacity:0;transform:translateY(8px) rotate(35deg) scale(.72)}
+.theme-toggle.is-dark .theme-moon{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}
+.theme-toggle.is-dark .theme-stars i{opacity:.92;transform:scale(1)}
+
+/* Keep destructive semantics equally obvious in both appearances. */
+html[data-theme="dark"] .settings-action-row.destructive .settings-row-copy strong,
+html[data-theme="dark"] .settings-action-row.destructive .settings-action-icon{
+  color:var(--ff-dark-destructive)!important;
+}
+html[data-theme="dark"] .week-reset-go{background:var(--ff-dark-destructive)!important;color:#fff!important}
+
+@media(prefers-reduced-motion:reduce){
+  .theme-cloud,
+.theme-toggle-track::before,
+.theme-toggle-track::after{transition:none!important}
+}
+
+/* Remaining outlined elements that inherit the light theme's black-border language. */
+html[data-theme="dark"] .note-kicker,
+html[data-theme="dark"] .warmup-label,
+html[data-theme="dark"] .day-exercise-number,
+html[data-theme="dark"] .set-prescription,
+html[data-theme="dark"] .log-watch-form-btn .watch-form-arrow,
+html[data-theme="dark"] .day-block-card.section-complete .section-progress-rail,
+html[data-theme="dark"] .secondary-timer-btn,
+html[data-theme="dark"] .day-complete-mark{
+  border-color:var(--ff-dark-contrast-border)!important;
+}
+
+
+/* === Targeted dark-mode QA fixes: settings labels, flame tile, exercise detail visibility === */
+/* Settings is concise: no group headings above individual settings. */
+.settings-group + .settings-group{margin-top:10px!important}
+.settings-dev-note + .settings-group{margin-top:10px!important}
+
+/* Weekly flame keeps the original yellow tile but now has the same outlined motif as the app. */
+.week-goal-icon{
+  border:2px solid #111!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+}
+html[data-theme="dark"] .week-goal-icon{
+  border-color:#d8d3c9!important;
+}
+
+/* Exercise movement artwork mirrors the light-theme top/bottom divider treatment. */
+html[data-theme="dark"] .movement-figure,
+html[data-theme="dark"] .movement-figure.edge-to-edge,
+html[data-theme="dark"] .wg-movement-figure{
+  border-top:2px solid #d8d3c9!important;
+  border-bottom:2px solid #d8d3c9!important;
+}
+
+/* Instruction markers were still inheriting light-mode ink. Keep both the copy and marker visible. */
+html[data-theme="dark"] .note-bullet-list li{
+  color:var(--ff-dark-text)!important;
+}
+html[data-theme="dark"] .note-bullet-list li::before,
+html[data-theme="dark"] .caution-card .note-bullet-list li::before{
+  color:#d8d3c9!important;
+}
+
+/* Watch Form's external-link glyph uses currentColor; give the button and glyph an explicit dark-mode ink. */
+html[data-theme="dark"] .log-watch-form-btn{
+  color:var(--ff-dark-text)!important;
+}
+html[data-theme="dark"] .log-watch-form-btn .watch-form-arrow{
+  color:#111!important;
+  background:var(--ff-yellow)!important;
+  border-color:#d8d3c9!important;
+}
+html[data-theme="dark"] .log-watch-form-btn .watch-form-arrow svg{
+  color:#111!important;
+  stroke:#111!important;
+}
+
+
+/* === Dark-mode + interaction QA pass === */
+/* Keep scrolling functional while removing browser scroll chrome throughout the PWA. */
+*{scrollbar-width:none!important;-ms-overflow-style:none!important}
+*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;background:transparent!important}
+
+/* Match the light workout card's fine exercise separators with a quiet warm-white line. */
+html[data-theme="dark"] .day-exercise-row + .day-exercise-row::before{
+  background:rgba(216,211,201,.18)!important;
+}
+
+/* Warm-up reveal divider: same hierarchy as light mode, adapted for the dark surface. */
+html[data-theme="dark"] .warmup.open .warmup-details::before{
+  border-top-color:rgba(216,211,201,.20)!important;
+}
+
+/* Target anatomy assets already contain alpha; never paint a white/dark rectangle behind them. */
+.target-visual,
+.target-muscle-image,
+html[data-theme="dark"] .target-visual,
+html[data-theme="dark"] .target-muscle-image{
+  background:transparent!important;
+}
+
+/* Progress attendance polish. */
+#gymVisitToggle>span:last-child{padding-top:2px}
+html[data-theme="dark"] .biometric-icon{
+  background:var(--ff-yellow)!important;
+  color:#111!important;
+  border-color:var(--ff-dark-contrast-border)!important;
+}
+html[data-theme="dark"] .biometric-icon svg{
+  color:#111!important;
+  stroke:#111!important;
+}
+
+/* Working-set count must remain readable before completion as well as after it. */
+html[data-theme="dark"] .set-progress-chip:not(.is-complete) .set-progress-copy strong{
+  color:var(--ff-dark-text)!important;
+}
+
+/* Native-feeling sheet drag surface and snap-back. */
+.settings-sheet{touch-action:none;overscroll-behavior:contain}
+.settings-grabber,
+.settings-header{user-select:none;-webkit-user-select:none}
+.settings-sheet.is-dragging{transition:none!important;will-change:transform,opacity}
+.settings-sheet.is-snapping-back{transition:transform .32s cubic-bezier(.22,1,.36,1),opacity .24s ease!important}
+
+/* Higher-fidelity living flame: independent tongues, hot core and soft floor glow. */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* === Canonical refinement: attendance times + reference-inspired vector tabs === */
+
+
+
+
+
+
+.gym-today-times{
+  display:grid;
+  grid-template-columns:1fr 1px 1fr;
+  align-items:center;
+  gap:12px;
+  margin:10px 0 0;
+  padding:11px 13px;
+  border:1.5px solid rgba(17,17,17,.12);
+  border-radius:14px;
+  background:rgba(255,255,255,.46);
+}
+.gym-today-times>div{display:grid;gap:2px;min-width:0}
+.gym-today-times small{font-size:9.5px;line-height:1.1;text-transform:uppercase;letter-spacing:.055em;font-weight:700;color:#756f66}
+.gym-today-times strong{font-size:13px;line-height:1.15;font-weight:650;color:#171717;white-space:nowrap}
+.gym-time-divider{width:1px;height:28px;background:rgba(17,17,17,.10)}
+html[data-theme="dark"] .gym-today-times{background:#26241f!important;border-color:var(--ff-dark-contrast-border)!important}
+html[data-theme="dark"] .gym-today-times small{color:var(--ff-dark-secondary)!important}
+html[data-theme="dark"] .gym-today-times strong{color:var(--ff-dark-text)!important}
+html[data-theme="dark"] .gym-time-divider{background:rgba(216,211,201,.20)!important}
+
+/* Completed workout-list status must stay legible in dark mode. */
+html[data-theme="dark"] .set-progress-chip.is-complete{
+  background:var(--ff-yellow)!important;
+  border-color:var(--ff-dark-contrast-border)!important;
+}
+html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-copy,
+html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-copy strong,
+html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-copy>span{
+  color:#111!important;
+  opacity:1!important;
+}
+
+/* Target-area artwork should never gain a painted background from its container. */
+.target-card .target-visual,
+.target-card .target-muscle-image,
+.target-visual,
+.target-muscle-image{
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+.test-notification-btn.is-busy{opacity:.68;pointer-events:none}
+.test-notification-btn.is-sent{background:rgba(52,199,89,.12)!important}
+
+
+/* Canonical nav icons — use the user-supplied artwork unchanged. */
+.nav-item .nav-icon.supplied-nav-icon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  overflow:visible;
+}
+.nav-item .nav-icon.supplied-nav-icon img{
+  display:block;
+  width:34px;
+  height:34px;
+  object-fit:contain;
+  image-rendering:auto;
+  -webkit-user-drag:none;
+  user-select:none;
+}
+.nav-item[data-nav="timer"] .nav-icon.supplied-nav-icon img{width:32px;height:32px}
+.nav-item.active .nav-icon.supplied-nav-icon,
+.nav-item .nav-icon.supplied-nav-icon{transform:none!important;filter:none!important}
+.nav-item:not(.active) .nav-icon.supplied-nav-icon{opacity:.58}
+.nav-item.active .nav-icon.supplied-nav-icon{opacity:1}

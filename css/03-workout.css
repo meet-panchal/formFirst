@@ -1,0 +1,643 @@
+/* v4 Workout page — match the notes/exercise-detail theme */
+.note-workout { background:
+  radial-gradient(circle at 12% 0%, rgba(255, 219, 89, .20), transparent 30%),
+  radial-gradient(circle at 100% 14%, rgba(255, 135, 58, .10), transparent 32%),
+  linear-gradient(180deg, #fffef9 0%, #f7f1e5 100%);
+}
+.workout-topbar { border-bottom:2px solid #111; }
+.note-workout-container { padding-top:10px; }
+.note-workout-header { padding:14px 2px 14px; }
+.note-workout-header h1 {
+  margin:10px 0 6px;
+  font-size:clamp(34px, 9vw, 44px);
+  line-height:.96;
+  letter-spacing:-.045em;
+  color:#101426;
+  font-weight:800;
+}
+.note-workout .day-strip { gap:7px; margin:16px 0 14px; }
+.note-workout .day-pill {
+  min-height:58px;
+  padding:8px 4px 7px;
+  border:2px solid #111;
+  border-radius:15px;
+  background:#fffdf5;
+  color:#161616;
+  box-shadow:3px 3px 0 rgba(0,0,0,.05);
+  opacity:1;
+}
+.note-workout .day-pill strong { font-size:13px; font-weight:800; }
+.note-workout .day-pill small { font-size:10px; opacity:.68; }
+.note-workout .day-pill.active {
+  background:#ffe55c;
+  color:#111;
+  box-shadow:4px 4px 0 rgba(0,0,0,.08);
+}
+.note-workout .day-pill:not(.active) { opacity:.62; }
+
+.note-summary-card {
+  padding:16px;
+  border:2px solid #111;
+  border-radius:22px;
+  background:#fffdf6;
+  box-shadow:6px 6px 0 rgba(0,0,0,.06);
+}
+.note-summary-card .summary-row h2 { font-size:19px; text-transform:uppercase; letter-spacing:-.02em; }
+.note-summary-card .summary-row p { color:#4a4a4a; font-size:12px; }
+.note-summary-card .progress-ring { width:50px; height:50px; background:conic-gradient(#111 var(--progress), #ece7d7 0); }
+.note-summary-card .progress-ring::after { background:#fffdf6; }
+.note-summary-card .primary-btn {
+  margin-top:14px;
+  min-height:50px;
+  border:2px solid #111;
+  border-radius:16px;
+  background:#111;
+  color:#ffe55c;
+  box-shadow:5px 5px 0 rgba(255,111,0,.18);
+  font-weight:800;
+}
+
+.note-section { margin-top:20px; }
+.note-group-card {
+  border:2px solid #111;
+  border-radius:22px;
+  background:#fffdf6;
+  box-shadow:6px 6px 0 rgba(0,0,0,.06);
+}
+.note-group-card.warmup { padding:13px 14px; }
+.note-group-card .warmup-details {
+  color:#333;
+  font-size:12px;
+  line-height:1.5;
+}
+
+@media (max-width:370px){
+  .note-workout .day-strip { gap:5px; }
+  .note-workout .day-pill { min-height:54px; border-radius:13px; }
+  .note-workout-header h1 { font-size:32px; }
+}
+
+/* Minor workout-page refinements */
+.day-pill { min-height: 46px; justify-content: center; }
+.day-pill strong { font-size: 13px; }
+.day-pill small { display: none; }
+
+.warmup.note-group-card { overflow: hidden; }
+.warmup-label {
+  display:inline-flex;
+  align-items:center;
+  min-height: 24px;
+  padding: 4px 9px 3px;
+  margin-bottom: 9px;
+  border: 1.7px solid #111;
+  border-radius: 999px;
+  background: #f5de46;
+  color:#111;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.warmup-details { margin-top: 0; }
+
+
+/* Warm-up card: artwork integrated into background */
+.warmup.note-group-card {
+  overflow: hidden;
+}
+
+
+/* warm-up card refinement: image as background, reveal notes on tap */
+.note-group-card.warmup {
+  padding: 0;
+  overflow: hidden;
+}
+.warmup-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 22px;
+  margin-bottom: 14px;
+  border: 2px solid #111;
+  border-radius: 999px;
+  background: #f4dc44;
+  color: #111;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  box-shadow: 0 1px 0 rgba(255,255,255,.45) inset;
+}
+.warmup-details {
+  display: block;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 18px;
+  color: #3b3b43;
+  font-size: 13px;
+  line-height: 1.55;
+  transition: max-height .28s ease, padding-top .28s ease, padding-bottom .28s ease;
+}
+.warmup.open .warmup-details {
+  max-height: 220px;
+  padding: 0 18px 16px;
+}
+@media (max-width: 390px) {
+  .warmup-label { min-height: 36px; padding: 0 18px; margin-bottom: 12px; font-size: 11px; }
+}
+
+
+/* explicit warmup art layer so image renders reliably */
+
+
+/* explicit img layer for warmup figure */
+
+
+/* warm-up card: unified text flow around illustration */
+.note-group-card.warmup {
+  padding: 0;
+  overflow: hidden;
+}
+.warmup-flow {
+  position: relative;
+  display: block;
+  min-height: 166px;
+  padding: 18px;
+  background: #fbf7ee;
+  cursor: pointer;
+}
+.warmup-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 22px;
+  margin: 0 0 14px;
+  border: 2px solid #111;
+  border-radius: 999px;
+  background: #f4dc44;
+  color: #111;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  box-shadow: 0 1px 0 rgba(255,255,255,.45) inset;
+}
+.warmup-heading {
+  display: block;
+  font-size: clamp(28px, 7.6vw, 44px);
+  line-height: .98;
+  letter-spacing: -.05em;
+  color: #111;
+  margin: 0;
+}
+.warmup-intro {
+  margin: 12px 0 0;
+  color: #404048;
+  font-size: 15px;
+  line-height: 1.34;
+  max-width: none;
+}
+.warmup-details {
+  display: block;
+  clear: both;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  color: #3b3b43;
+  font-size: 13px;
+  line-height: 1.55;
+  transition: max-height .28s ease, margin-top .28s ease, padding-top .28s ease;
+}
+.warmup.open .warmup-details {
+  max-height: 220px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(17,17,17,.1);
+}
+.warmup-flow:focus-visible {
+  outline: 3px solid rgba(16,24,40,.18);
+  outline-offset: -3px;
+}
+@media (max-width: 390px) {
+  .warmup-flow { min-height: 150px; padding: 16px; }
+  .warmup-label { min-height: 36px; padding: 0 18px; margin-bottom: 12px; font-size: 11px; }
+  .warmup-heading { font-size: 24px; }
+  .warmup-intro { margin-top: 10px; font-size: 14px; }
+}
+
+
+/* small step: warm-up illustration is now the card background */
+.warmup-flow {
+  background-image:
+    linear-gradient(90deg, rgba(251,247,238,.99) 0%, rgba(251,247,238,.96) 48%, rgba(251,247,238,.72) 64%, rgba(251,247,238,.14) 82%, rgba(251,247,238,0) 100%),
+    url("../assets/warmup/upper-body-mobility.webp");
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, right 10px bottom;
+  background-size: 100% 100%, auto 100%;
+}
+@media (max-width:390px){
+  .warmup-flow { background-size: 100% 100%, auto 100%; background-position: center, right 8px bottom; }
+}
+
+
+/* final warm-up card tweaks: cutout figure and no extra header above card */
+.warmup-flow {
+  background-image:
+    linear-gradient(90deg, rgba(251,247,238,.99) 0%, rgba(251,247,238,.98) 36%, rgba(251,247,238,.92) 53%, rgba(251,247,238,.55) 66%, rgba(251,247,238,.12) 78%, rgba(251,247,238,0) 100%),
+    var(--warmup-figure, url("../assets/warmup/upper-body-mobility-cutout-cropped.webp"));
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, right 18px bottom 0;
+  background-size: 100% 100%, auto 158px;
+}
+.note-section > .note-group-card.warmup:first-child { margin-top: 0; }
+@media (max-width:390px){
+  .warmup-flow {
+    background-position: center, right 16px bottom 0;
+    background-size: 100% 100%, auto 90%;
+  }
+}
+
+
+/* refine warm-up text flow so copy reaches right up to the figure */
+.warmup-flow {
+  padding-right: 152px;
+}
+.warmup-heading,
+.warmup-intro,
+.warmup-details,
+.warmup-label {
+  position: relative;
+  z-index: 1;
+}
+.warmup-intro {
+  max-width: none;
+  text-wrap: pretty;
+}
+.warmup-details {
+  max-width: none;
+}
+@media (max-width: 390px) {
+  .warmup-flow {
+    padding-right: 144px;
+  }
+}
+
+
+/* mobile-only responsive warm-up card */
+:root { --mobile-card-pad: clamp(14px, 4.2vw, 18px); --warmup-figure-right: clamp(6px, 1.8vw, 10px); --warmup-figure-top: clamp(16px, 4.6vw, 20px); }
+.note-section { margin-left: 0; margin-right: 0; }
+.note-group-card.warmup {
+  width: 100%;
+  max-width: 100%;
+}
+.warmup-flow {
+  min-height: clamp(148px, 43vw, 172px);
+  padding-top: var(--mobile-card-pad);
+  padding-bottom: var(--mobile-card-pad);
+  padding-left: var(--mobile-card-pad);
+  padding-right: clamp(132px, 38vw, 156px);
+  background-position: center, right var(--warmup-figure-right) top var(--warmup-figure-top);
+  background-size: 100% 100%, auto clamp(128px, 36vw, 154px);
+  border-radius: inherit;
+}
+.warmup-label {
+  min-height: clamp(34px, 9.5vw, 40px);
+  padding: 0 clamp(16px, 5vw, 22px);
+  margin-bottom: clamp(10px, 3vw, 14px);
+  font-size: clamp(10px, 2.8vw, 12px);
+}
+.warmup-heading {
+  font-size: clamp(24px, 7vw, 32px);
+  line-height: .98;
+}
+.warmup-intro {
+  margin-top: clamp(8px, 2.6vw, 12px);
+  font-size: clamp(13px, 3.7vw, 15px);
+  line-height: 1.32;
+}
+.warmup-details {
+  font-size: clamp(12px, 3.3vw, 13px);
+}
+@media (max-width: 350px) {
+  .warmup-flow {
+    min-height: 144px;
+    padding-right: 122px;
+    background-size: 100% 100%, auto 124px;
+  }
+  .warmup-heading { font-size: 22px; }
+  .warmup-intro { font-size: 12.5px; }
+}
+@media (min-width: 400px) and (max-width: 480px) {
+  .warmup-flow {
+    min-height: 172px;
+    padding-right: 158px;
+    background-size: 100% 100%, auto 158px;
+  }
+}
+
+
+/* keep warm-up figure size stable while card expands */
+.warmup-flow {
+  transition: none !important;
+}
+.warmup.open .warmup-flow {
+  background-size: 100% 100%, auto clamp(128px, 36vw, 154px);
+}
+@media (max-width: 350px) {
+  .warmup.open .warmup-flow { background-size: 100% 100%, auto 124px; }
+}
+@media (min-width: 400px) and (max-width: 480px) {
+  .warmup.open .warmup-flow { background-size: 100% 100%, auto 158px; }
+}
+
+
+/* keep the figure spatially anchored when the card expands */
+.warmup-flow,
+.warmup.open .warmup-flow {
+  background-position: center, right var(--warmup-figure-right) top var(--warmup-figure-top);
+}
+
+
+/* expanded warm-up notes use the full card width */
+.warmup-flow {
+  padding-right: var(--mobile-card-pad);
+}
+.warmup-label,
+.warmup-heading,
+.warmup-intro {
+  max-width: calc(100% - clamp(118px, 34vw, 142px));
+}
+.warmup-details {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+}
+.warmup.open .warmup-details {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+@media (max-width: 350px) {
+  .warmup-flow { padding-right: var(--mobile-card-pad); }
+  .warmup-label,
+.warmup-heading,
+.warmup-intro { max-width: calc(100% - 108px); }
+}
+@media (min-width: 400px) and (max-width: 480px) {
+  .warmup-flow { padding-right: var(--mobile-card-pad); }
+  .warmup-label,
+.warmup-heading,
+.warmup-intro { max-width: calc(100% - 146px); }
+}
+
+
+/* Day 1 full workout cards — extend the approved notes theme */
+.workout-block-section { margin-top: 20px; }
+.day-block-card {
+  overflow: hidden;
+  border: 2px solid #111;
+  border-radius: 24px;
+  background: #fffdf6;
+  box-shadow: 6px 6px 0 rgba(0,0,0,.06);
+}
+.day-block-head {
+  padding: 16px 16px 13px;
+  border-bottom: 2px solid #111;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,229,92,.30), transparent 45%),
+    #fbf7ee;
+}
+.day-block-heading-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+.day-block-heading-row h2 {
+  margin: 0;
+  color: #111;
+  font-size: clamp(22px, 6.5vw, 30px);
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+.day-block-heading-row p {
+  margin: 6px 0 0;
+  color: #56545b;
+  font-size: clamp(11px, 3.2vw, 13px);
+  line-height: 1.35;
+}
+.day-block-count {
+  flex: 0 0 auto;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #111;
+  border-radius: 12px;
+  background: #111;
+  color: #ffe55c;
+  font-size: 13px;
+  font-weight: 900;
+}
+.day-exercise-list { background: #fffdf6; }
+.day-exercise-row {
+  width: 100%;
+  min-height: 82px;
+  padding: 12px 13px;
+  border: 0;
+  background: transparent;
+  color: #111;
+  display: grid;
+  grid-template-columns: 42px minmax(0,1fr) 24px;
+  align-items: center;
+  gap: 11px;
+  text-align: left;
+  position: relative;
+}
+.day-exercise-row + .day-exercise-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 66px;
+  right: 14px;
+  height: 1px;
+  background: rgba(17,17,17,.14);
+}
+.day-exercise-row:active { background: #fff7cb; }
+.day-exercise-number {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #111;
+  border-radius: 11px;
+  background: #ffe55c;
+  color: #111;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.05);
+}
+.day-exercise-number svg { width: 18px; height: 18px; }
+.day-exercise-copy { min-width: 0; }
+.day-exercise-copy strong {
+  display: block;
+  font-size: clamp(14px, 4vw, 16px);
+  line-height: 1.18;
+  letter-spacing: -.018em;
+  overflow-wrap: anywhere;
+}
+.day-exercise-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 7px;
+  margin-top: 5px;
+  color: #55545a;
+  font-size: clamp(10px, 2.9vw, 12px);
+  line-height: 1.25;
+}
+.day-exercise-meta span:not(:last-child)::after {
+  content: "·";
+  margin-left: 7px;
+  color: #99928b;
+}
+.day-exercise-copy small {
+  display: block;
+  margin-top: 5px;
+  color: #6a675f;
+  font-size: 10px;
+  font-weight: 700;
+}
+.day-exercise-chevron {
+  display: grid;
+  place-items: center;
+  color: #111;
+}
+.day-exercise-chevron svg { width: 18px; height: 18px; }
+.day-exercise-row.is-complete .day-exercise-number {
+  background: #111;
+  color: #ffe55c;
+}
+.day-exercise-row.is-complete .day-exercise-copy strong { color: #49463f; }
+.finish-block .day-block-head {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,174,0,.18), transparent 48%),
+    #fbf7ee;
+}
+
+/* Mobile-only tuning for the workout blocks */
+@media (max-width: 350px) {
+  .day-block-head { padding: 14px 13px 12px; }
+  .day-exercise-row {
+    min-height: 76px;
+    padding: 10px 10px;
+    grid-template-columns: 38px minmax(0,1fr) 20px;
+    gap: 9px;
+  }
+  .day-exercise-row + .day-exercise-row::before { left: 57px; right: 11px; }
+  .day-exercise-number { width: 34px; height: 34px; border-radius: 10px; }
+  .day-exercise-meta { gap: 2px 5px; font-size: 9.5px; }
+  .day-exercise-meta span:not(:last-child)::after { margin-left: 5px; }
+}
+@media (min-width: 400px) and (max-width: 480px) {
+  .day-block-head { padding: 18px 18px 15px; }
+  .day-exercise-row { min-height: 86px; padding: 13px 15px; grid-template-columns: 44px minmax(0,1fr) 26px; gap: 12px; }
+  .day-exercise-number { width: 40px; height: 40px; }
+  .day-exercise-row + .day-exercise-row::before { left: 72px; right: 16px; }
+}
+
+
+/* exercise-type-aware logging */
+.set-prescription {
+  height: 40px;
+  padding: 4px 8px 3px;
+  border: 1.7px solid #111;
+  border-radius: 11px;
+  background: #fff8d5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.set-prescription span {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #5a5a5a;
+}
+.set-prescription strong {
+  margin-top: 1px;
+  font-size: 11px;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+@media (max-width:350px){
+  .set-prescription strong { font-size: 10px; }
+}
+
+/* 5-day mobile-only compact pass */
+.note-workout-container { padding-bottom: 28px; }
+.note-workout-header { padding-top: 10px; padding-bottom: 10px; }
+.note-workout-header h1 { margin: 7px 0 5px; font-size: clamp(30px, 8vw, 36px); }
+.note-workout .day-strip { gap: 6px; margin-bottom: 10px; }
+.note-workout .day-pill { min-height: 40px; border-radius: 12px; padding: 5px 3px; }
+.note-workout .day-pill strong { font-size: 11px; }
+
+.compact-summary-card { padding: 12px 13px; border-radius: 18px; }
+.compact-summary-card .summary-row { align-items: center; }
+.compact-summary-card .summary-row h2 { font-size: 16px; }
+.compact-summary-card .summary-row p { margin-top: 3px; font-size: 10.5px; }
+.compact-summary-card .progress-ring { width: 42px; height: 42px; }
+.compact-summary-card .progress-ring strong { font-size: 11px; }
+.compact-start-btn { min-height: 44px !important; margin-top: 10px !important; border-radius: 13px !important; font-size: 12px !important; }
+
+.compact-warmup-section { margin-top: 14px; }
+.compact-warmup-flow { min-height: clamp(132px, 37vw, 148px); padding-top: 13px; padding-bottom: 13px; }
+.compact-warmup-flow .warmup-label { min-height: 31px; padding: 0 14px; margin-bottom: 9px; font-size: 9.5px; }
+.compact-warmup-flow .warmup-heading { font-size: clamp(22px, 6.5vw, 28px); }
+.compact-warmup-flow .warmup-intro { margin-top: 7px; font-size: clamp(12px, 3.45vw, 13.5px); line-height: 1.28; }
+.compact-warmup-flow .warmup-details { font-size: 12px; line-height: 1.45; }
+
+.workout-block-section { margin-top: 14px; }
+.day-block-card { border-radius: 18px; box-shadow: 4px 4px 0 rgba(0,0,0,.05); }
+.day-block-head { padding: 10px 12px 9px; border-bottom-width: 1.5px; }
+.day-block-heading-row { margin-top: 8px; align-items: center; }
+.day-block-heading-row h2 { font-size: clamp(18px, 5.6vw, 22px); }
+.day-block-heading-row p { margin-top: 3px; font-size: 10px; }
+.day-block-count { min-width: 30px; height: 30px; border-radius: 9px; font-size: 11px; }
+.day-exercise-row { min-height: 62px; padding: 8px 10px; grid-template-columns: 34px minmax(0,1fr) 18px; gap: 9px; }
+.day-exercise-row + .day-exercise-row::before { left: 52px; right: 10px; }
+.day-exercise-number { width: 30px; height: 30px; border-width: 1.6px; border-radius: 9px; font-size: 11px; box-shadow: none; }
+.day-exercise-number svg { width: 15px; height: 15px; }
+.day-exercise-copy strong { font-size: clamp(12.5px, 3.7vw, 14px); line-height: 1.14; }
+.day-exercise-meta { margin-top: 3px; gap: 2px 5px; font-size: clamp(9px, 2.65vw, 10.5px); line-height: 1.18; }
+.day-exercise-meta span:not(:last-child)::after { margin-left: 5px; }
+.day-exercise-copy small { margin-top: 3px; font-size: 8.5px; }
+.day-exercise-chevron svg { width: 15px; height: 15px; }
+
+/* Compact detail cards on phones without changing the approved visual language */
+.note-detail-content { padding-top: 6px; }
+.note-heading { padding-bottom: 8px; }
+.note-heading h1 { font-size: clamp(26px, 7.2vw, 34px); }
+.detail-section { margin-top: 12px; }
+.note-card { padding: 11px 12px; border-radius: 16px; }
+.target-card { min-height: 102px; }
+.reading-card p,
+.caution-card p { font-size: 12px; line-height: 1.44; }
+.compact-set-line { padding-top: 7px; padding-bottom: 7px; }
+
+@media (max-width: 350px) {
+  .note-workout .day-strip { gap: 4px; }
+  .note-workout .day-pill { min-height: 38px; }
+  .day-exercise-row { min-height: 58px; padding: 7px 8px; grid-template-columns: 32px minmax(0,1fr) 16px; gap: 8px; }
+  .day-exercise-number { width: 28px; height: 28px; }
+  .day-exercise-row + .day-exercise-row::before { left: 47px; right: 8px; }
+  .day-exercise-copy strong { font-size: 12px; }
+  .day-exercise-meta { font-size: 8.8px; }
+}
