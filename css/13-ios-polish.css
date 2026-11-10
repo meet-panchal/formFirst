@@ -1,0 +1,596 @@
+/* iPhone/iPad compatibility refinements — layered after the visual theme. */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+  background-color: #fffdf6;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] #app {
+  background-color: #11110f;
+}
+
+body {
+  min-height: 100svh;
+  min-height: 100dvh;
+  overflow-x: clip;
+  overscroll-behavior-y: none;
+  touch-action: pan-y;
+}
+
+#app {
+  min-height: 100dvh;
+  isolation: isolate;
+}
+
+/* Keep the exercise page inside its own scroll viewport. This prevents iOS
+   rubber-band scrolling from exposing the previous-page snapshot behind it. */
+.edge-back-stage {
+  min-height: 100dvh;
+  background: var(--ff-main-page-gradient, #11110f);
+  overflow: clip;
+  overscroll-behavior: none;
+}
+
+.edge-back-stage > .detail-screen {
+  position: relative;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: var(--ff-main-page-gradient, #11110f) !important;
+  scrollbar-width: none;
+}
+
+.edge-back-stage > .detail-screen::-webkit-scrollbar {
+  display: none;
+}
+
+/* The workout snapshot is only needed during an active back swipe. Hiding it
+   at rest avoids it showing through during iOS pull-down/rubber-band motion. */
+.edge-back-underlay {
+  visibility: hidden;
+  transition: visibility 0s linear 240ms;
+}
+
+.edge-back-stage.edge-back-active .edge-back-underlay,
+.edge-back-stage.edge-back-committing .edge-back-underlay,
+.edge-back-stage.edge-back-cancelling .edge-back-underlay {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* iOS applies a native blue tint to un-normalized buttons. Explicitly define
+   the preset appearance so it always follows the Form First palette. */
+.timer-presets button,
+.timer-presets button:focus,
+.timer-presets button:active {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  color: #111 !important;
+  -webkit-text-fill-color: #111;
+  background: #fffdf6 !important;
+  border: 1.5px solid #111 !important;
+  border-radius: 12px;
+  box-shadow: none;
+  font: inherit;
+  font-weight: 900;
+  outline-color: #ffe55c;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.timer-presets button.active,
+.timer-presets button.active:focus,
+.timer-presets button.active:active {
+  color: #111 !important;
+  -webkit-text-fill-color: #111;
+  background: #ffe55c !important;
+  border-color: #111 !important;
+  box-shadow: 2px 2px 0 rgba(17, 17, 17, .10);
+}
+
+html[data-theme="dark"] .timer-presets button,
+html[data-theme="dark"] .timer-presets button:focus,
+html[data-theme="dark"] .timer-presets button:active {
+  color: #f7f4ed !important;
+  -webkit-text-fill-color: #f7f4ed;
+  background: #24221e !important;
+  border-color: #47433c !important;
+}
+
+html[data-theme="dark"] .timer-presets button.active,
+html[data-theme="dark"] .timer-presets button.active:focus,
+html[data-theme="dark"] .timer-presets button.active:active {
+  color: #111 !important;
+  -webkit-text-fill-color: #111;
+  background: var(--ff-yellow, #ffe55c) !important;
+  border-color: #111 !important;
+}
+
+/* Keep focus visible without inheriting the old blue browser accent. */
+.timer-presets button:focus-visible {
+  outline: 3px solid rgba(255, 229, 92, .72);
+  outline-offset: 2px;
+}
+
+/* Explicit safe-area coverage for standalone iOS home-screen launches. */
+.topbar {
+  padding-top: calc(var(--safe-top) + 7px);
+  min-height: calc(58px + var(--safe-top));
+}
+
+/* This is intentionally non-zoomable app UI. Vertical scrolling remains
+   enabled; iOS system accessibility magnification remains separate. */
+html,
+body,
+#app {
+  touch-action: pan-y;
+}
+
+
+/* === v38 iPhone home, warm-up art, notification gestures and back transition === */
+html,
+body,
+#app {
+  min-height: 100dvh;
+  overscroll-behavior-x: none;
+}
+
+body {
+  background-color: #11110f;
+  padding-top: 0;
+  padding-bottom: calc(var(--bottom-nav-h, 58px) + var(--safe-bottom));
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body,
+html[data-theme="light"] #app {
+  background-color: #fffdf6;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] #app {
+  background-color: #11110f;
+}
+
+/* iOS standalone status bar uses a translucent status region. The document
+   canvas now continues behind it, while the topbar keeps its safe-area padding. */
+@media (display-mode: standalone) {
+  html, body { min-height: 100%; }
+  body::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    inset: 0 0 auto;
+    height: var(--safe-top);
+    background: #11110f;
+    pointer-events: none;
+  }
+}
+
+/* Per-day warm-up illustrations are real image elements, not CSS backgrounds.
+   This avoids iOS WebKit dropping a custom-property background image on first paint. */
+.warmup-flow {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #fbf7ee !important;
+  padding-right: 12px !important;
+}
+.warmup-illustration {
+  position: absolute;
+  z-index: 0;
+  right: 3px;
+  bottom: 0;
+  width: min(46%, 154px);
+  height: 100%;
+  object-fit: contain;
+  object-position: right bottom;
+  opacity: .98;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.warmup-flow::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, #fbf7ee 0%, rgba(251,247,238,.99) 43%, rgba(251,247,238,.88) 57%, rgba(251,247,238,.20) 78%, transparent 100%);
+}
+.warmup-flow > :not(.warmup-illustration) {
+  position: relative;
+  z-index: 2;
+}
+.warmup-flow .warmup-label,
+.warmup-flow .warmup-heading,
+.warmup-flow .warmup-intro {
+  max-width: min(66%, 260px);
+}
+.warmup-flow .warmup-details {
+  max-width: 100%;
+}
+html[data-theme="dark"] .warmup-flow {
+  background: #1c1b18 !important;
+}
+html[data-theme="dark"] .warmup-flow::before {
+  background: linear-gradient(90deg, rgba(28,27,24,.99) 0%, rgba(28,27,24,.98) 43%, rgba(28,27,24,.88) 57%, rgba(28,27,24,.20) 78%, transparent 100%);
+}
+html[data-theme="dark"] .warmup.open .warmup-illustration { opacity: .36; }
+@media (max-width: 390px) {
+  .warmup-illustration { width: min(45%, 140px); }
+  .warmup-flow .warmup-label,
+  .warmup-flow .warmup-heading,
+  .warmup-flow .warmup-intro { max-width: 62%; }
+}
+
+/* Compact tab bar: keep the iPhone home-indicator safe area, reduce excess
+   internal padding, and keep it fixed while the detail screen transitions. */
+:root { --bottom-nav-h: 54px; }
+.note-bottom-nav {
+  box-sizing: border-box !important;
+  height: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  min-height: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  padding: 2px 12px var(--safe-bottom) !important;
+  gap: 6px !important;
+  align-items: center !important;
+  transform: translate3d(-50%, 0, 0) !important;
+  z-index: 2000 !important;
+  will-change: auto !important;
+}
+.nav-item,
+.nav-item.active {
+  min-height: 46px !important;
+  height: 46px !important;
+  transform: none !important;
+}
+.nav-item .nav-icon,
+.nav-item.active .nav-icon {
+  width: 36px !important;
+  height: 36px !important;
+}
+.nav-item .nav-icon img { width: 36px; height: 36px; object-fit: contain; }
+body.edge-back-gesture-active .note-bottom-nav {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 0 !important;
+  transform: translate3d(-50%, 0, 0) !important;
+  transition: none !important;
+}
+
+/* Native-feeling interactive pop: only the detail content surface moves. */
+.edge-back-stage {
+  position: relative;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden !important;
+  isolation: isolate;
+  touch-action: pan-y;
+  overscroll-behavior: none;
+}
+.edge-back-stage > .detail-screen {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100%;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  transform: translate3d(0,0,0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+.edge-back-stage.edge-back-active > .detail-screen {
+  border-radius: 0 12px 12px 0;
+  box-shadow: 12px 0 32px rgba(0,0,0,calc(.12 + .16 * var(--edge-back-progress,0)));
+}
+.edge-back-underlay { pointer-events: none !important; }
+body.edge-back-gesture-active #bottomNav { pointer-events: none; }
+body.edge-back-gesture-active #bottomNav .nav-item { pointer-events: none; }
+html, body, #app { overscroll-behavior-x: none; }
+
+/* In-app notices dismiss with an upward swipe; the close button is intentionally removed. */
+.recovery-reward-banner { touch-action: pan-x; cursor: grab; }
+.recovery-reward-head { grid-template-columns: 48px minmax(0, 1fr) !important; }
+.recovery-reward-close { display: none !important; }
+
+/* Settings indicates that background push requires an external push sender. */
+
+
+/* === v38.1 full-bleed status area and final iOS interaction polish === */
+:root { --bottom-nav-h: 50px; }
+html,
+body {
+  background: var(--app-canvas, #fffdf6) !important;
+}
+html { --app-canvas: #fffdf6; }
+html[data-theme="dark"] { --app-canvas: #11110f; }
+body::before { z-index: 0 !important; background: var(--app-canvas) !important; }
+#app { position: relative; z-index: 1; }
+#bottomNav { z-index: 2000 !important; }
+.brand-splash { z-index: 2147483646 !important; }
+
+@media (display-mode: standalone) {
+  body::before {
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    content: "";
+    pointer-events: none;
+  }
+}
+
+.note-bottom-nav {
+  height: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  min-height: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  padding: 1px 12px var(--safe-bottom) !important;
+}
+.nav-item,
+.nav-item.active {
+  height: 44px !important;
+  min-height: 44px !important;
+}
+.nav-item .nav-icon,
+.nav-item.active .nav-icon,
+.nav-item .nav-icon img {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+.recovery-reward-banner.is-swiped-away {
+  opacity: 0 !important;
+  transform: translate3d(-50%, -115%, 0) scale(.94) !important;
+  pointer-events: none !important;
+}
+
+
+/* Detail has its own scroll viewport; the document itself must not rubber-band. */
+body.detail-view {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
+body.detail-view #app {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+}
+body.detail-view .edge-back-stage {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+}
+
+/* === v39 settings overlay, resilient viewport scrolling and warm-up layout === */
+html {
+  height: 100%;
+  overscroll-behavior-y: none;
+}
+
+body {
+  height: 100dvh;
+  min-height: 100dvh;
+  padding-bottom: 0 !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.settings-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* The settings modal sits above the tab bar and temporarily hides it. */
+.settings-overlay {
+  z-index: 2200 !important;
+  inset: 0 !important;
+  align-items: flex-end !important;
+  overflow: hidden !important;
+  padding-top: var(--safe-top, env(safe-area-inset-top, 0px));
+}
+
+.note-bottom-nav {
+  transition:
+    opacity .22s ease,
+    visibility .22s ease,
+    transform .28s cubic-bezier(.22, 1, .36, 1) !important;
+}
+
+body.settings-open #bottomNav {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translate3d(-50%, 12px, 0) !important;
+}
+
+.settings-overlay .settings-sheet {
+  box-sizing: border-box;
+  width: min(100%, 540px);
+  max-height: calc(100dvh - var(--safe-top, env(safe-area-inset-top, 0px)) - 8px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y !important;
+  scrollbar-width: none;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.settings-overlay .settings-sheet::-webkit-scrollbar {
+  display: none;
+}
+
+.settings-overlay .settings-header {
+  position: sticky;
+  top: -7px;
+  z-index: 4;
+  background: inherit;
+  padding-top: 6px !important;
+}
+
+.settings-overlay .settings-grabber {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  touch-action: none;
+  cursor: grab;
+}
+
+.settings-overlay .settings-grabber:active {
+  cursor: grabbing;
+}
+
+/* Keep each warm-up image in its own grid column. Expanded copy always sits
+   below the image, never underneath the artwork. */
+.warmup-flow.compact-warmup-flow {
+  display: block;
+  min-height: 0 !important;
+  padding: 12px 14px !important;
+  overflow: hidden;
+  background: #fbf7ee !important;
+  background-image: none !important;
+  transition: background-color .28s ease, border-color .28s ease !important;
+  will-change: auto;
+}
+
+.warmup-flow.compact-warmup-flow::before {
+  display: none !important;
+  content: none !important;
+}
+
+.warmup-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(104px, 38%);
+  align-items: center;
+  gap: 8px;
+  min-height: clamp(122px, 35vw, 150px);
+}
+
+.warmup-copy {
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.warmup-flow .warmup-label,
+.warmup-flow .warmup-heading,
+.warmup-flow .warmup-intro {
+  width: auto;
+  max-width: none !important;
+}
+
+.warmup-flow .warmup-label {
+  margin: 0 0 9px;
+  min-height: 31px;
+  padding: 0 14px;
+  font-size: 9.5px;
+}
+
+.warmup-flow .warmup-heading {
+  font-size: clamp(22px, 6.5vw, 28px);
+  line-height: 1.02;
+  overflow-wrap: anywhere;
+}
+
+.warmup-flow .warmup-intro {
+  margin: 7px 0 0;
+  font-size: clamp(12px, 3.45vw, 13.5px);
+  line-height: 1.32;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.warmup-flow .warmup-illustration {
+  position: relative !important;
+  z-index: 0;
+  display: block;
+  width: 100% !important;
+  height: clamp(112px, 34vw, 148px) !important;
+  max-width: 100%;
+  margin: 0;
+  inset: auto !important;
+  object-fit: contain;
+  object-position: center bottom;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    transform .46s cubic-bezier(.22, 1, .36, 1),
+    opacity .30s ease;
+}
+
+.warmup.open .warmup-illustration {
+  transform: translate3d(0, -2px, 0) scale(1.025);
+}
+
+.warmup-flow .warmup-details {
+  display: block;
+  width: 100%;
+  max-width: none;
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translate3d(0, -6px, 0);
+  border-top: 0 solid transparent;
+  transition:
+    max-height .44s cubic-bezier(.22, 1, .36, 1),
+    margin-top .34s cubic-bezier(.22, 1, .36, 1),
+    padding-top .34s cubic-bezier(.22, 1, .36, 1),
+    opacity .24s ease,
+    transform .38s cubic-bezier(.22, 1, .36, 1);
+  will-change: max-height, opacity, transform;
+}
+
+.warmup.open .warmup-flow .warmup-details {
+  max-height: 320px;
+  margin-top: 10px;
+  padding: 11px 0 2px;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  border-top: 1px solid rgba(17, 17, 17, .12);
+}
+
+html[data-theme="dark"] .warmup-flow.compact-warmup-flow {
+  background: #1c1b18 !important;
+}
+
+html[data-theme="dark"] .warmup.open .warmup-flow .warmup-details {
+  border-top-color: rgba(255, 255, 255, .14);
+}
+
+@media (max-width: 350px) {
+  .warmup-summary {
+    grid-template-columns: minmax(0, 1fr) minmax(92px, 36%);
+    gap: 5px;
+  }
+  .warmup-flow .warmup-heading { font-size: 21px; }
+  .warmup-flow .warmup-intro { font-size: 11.5px; }
+  .warmup-flow .warmup-illustration { height: 108px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warmup-flow.compact-warmup-flow,
+  .warmup-flow .warmup-illustration,
+  .warmup-flow .warmup-details,
+  .note-bottom-nav {
+    transition: none !important;
+    animation: none !important;
+  }
+}

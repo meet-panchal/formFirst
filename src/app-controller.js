@@ -21,6 +21,7 @@ import {
 } from './core/workout-progress.js';
 import { createGymAttendanceFeature } from './features/gym-attendance.js';
 import { createWaterReminderController } from './services/water-reminders.js';
+import { enableWebPush, disableWebPush, isWebPushConfigured } from './services/web-push.js';
 import { createTimerFeature } from './features/timer.js';
 import { celebrateDayCompletion, celebrateSetCompletion } from './ui/celebrations.js';
 import { installEdgeBackGesture } from './ui/edge-back.js';
@@ -41,6 +42,7 @@ import { buildGymStatusMarkup, buildGymTodayTimesMarkup, buildProgressMarkup } f
 import { buildExerciseDetailMarkup, renderSetLineMarkup } from './views/exercise-detail.js';
 
 const app = document.getElementById('app');
+try { history.replaceState({ formFirstView:'root' },'',location.href); } catch { /* The app can still work in embedded contexts without History API access. */ }
 
 let activeDay = 1;
 let exercises = DAYS[activeDay].exercises;
@@ -75,9 +77,16 @@ const tabViewState = {
   timer: { scrollY: 0 }
 };
 
+function detailScrollTop(){ return Math.max(0, Number(app.querySelector('.detail-screen')?.scrollTop) || 0); }
+
+function restoreDetailScroll(top=0){
+  const screen=app.querySelector('.detail-screen');
+  if(screen) screen.scrollTop=Math.max(0,Number(top)||0);
+}
+
 function captureTabViewState(){
   if(currentView==='workout'){
-    tabViewState.workout.scrollY=window.scrollY;
+    tabViewState.workout.scrollY=app.scrollTop;
     tabViewState.workout.warmupOpen=Boolean(document.getElementById('warmupCard')?.classList.contains('open'));
     tabViewState.workout.subview='workout';
     tabViewState.workout.exerciseId=null;
@@ -85,16 +94,16 @@ function captureTabViewState(){
   } else if(currentView==='detail'){
     tabViewState.workout.subview='detail';
     tabViewState.workout.exerciseId=currentExerciseId;
-    tabViewState.workout.detailScrollY=window.scrollY;
+    tabViewState.workout.detailScrollY=detailScrollTop();
   } else if(currentView==='progress'){
-    tabViewState.progress.scrollY=window.scrollY;
+    tabViewState.progress.scrollY=app.scrollTop;
   } else if(currentView==='timer'){
-    tabViewState.timer.scrollY=window.scrollY;
+    tabViewState.timer.scrollY=app.scrollTop;
   }
 }
 function restoreTabScroll(view){
   const top=Math.max(0,Number(tabViewState[view]?.scrollY)||0);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top,behavior:'instant'})));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ app.scrollTop = top; }));
 }
 function restoreWorkoutTabState(){
   const saved=tabViewState.workout;
@@ -222,6 +231,7 @@ function continueWorkoutFlow(){
 
 
 function renderProgress({restoreTabState=false}={}){
+  document.body.classList.remove('detail-view');
   currentView='progress'; currentExerciseId=null; setActiveNav('progress'); stopProgressClock();
   const all=Object.keys(DAYS).map(Number).map(day=>({day,...dayStats(day)}));
   const total=all.reduce((n,d)=>n+d.total,0);
@@ -276,7 +286,7 @@ function renderProgress({restoreTabState=false}={}){
     },30000);
   }
   if(restoreTabState) restoreTabScroll('progress');
-  else window.scrollTo({top:0,behavior:'instant'});
+  else app.scrollTop = 0;
 }
 
 const timerFeature=createTimerFeature({
@@ -293,16 +303,18 @@ const timerFeature=createTimerFeature({
 });
 
 function renderTimer({restoreTabState=false}={}){
+  document.body.classList.remove('detail-view');
   stopProgressClock();
   currentView='timer';
   currentExerciseId=null;
   setActiveNav('timer');
   timerFeature.render();
   if(restoreTabState) restoreTabScroll('timer');
-  else window.scrollTo({top:0,behavior:'instant'});
+  else app.scrollTop = 0;
 }
 
 function renderWorkout({restore=false,daySwitch=false,restoreTabState=false}={}){
+  document.body.classList.remove('detail-view');
   stopProgressClock();
   currentView='workout'; currentExerciseId=null; setActiveNav('workout');
   tabViewState.workout.subview='workout';
@@ -358,8 +370,9 @@ function renderWorkout({restore=false,daySwitch=false,restoreTabState=false}={})
   document.getElementById('moreBtn').addEventListener('click',openSettings);
   app.querySelectorAll('[data-exercise]').forEach(btn=>btn.addEventListener('click',()=>openExercise(btn.dataset.exercise)));
   if(daySwitch) requestAnimationFrame(()=>requestAnimationFrame(()=>app.querySelector('.day-switch-static')?.classList.remove('day-switch-static')));
-  if(restore) requestAnimationFrame(()=>window.scrollTo({top:workoutScroll,behavior:'instant'}));
+  if(restore) requestAnimationFrame(()=>{ app.scrollTop = workoutScroll; });
   else if(restoreTabState) restoreTabScroll('workout');
+  else app.scrollTop = 0;
 }
 
 
@@ -369,7 +382,7 @@ function openExercise(id,{restoreTabState=false}={}){
   setActiveNav('workout');
   const ex=exercises.find(e=>e.id===id); if(!ex) return;
   if(!restoreTabState){
-    workoutScroll=window.scrollY;
+    workoutScroll=app.scrollTop;
     tabViewState.workout.scrollY=workoutScroll;
     tabViewState.workout.warmupOpen=Boolean(document.getElementById('warmupCard')?.classList.contains('open'));
     tabViewState.workout.detailScrollY=0;
@@ -377,7 +390,11 @@ function openExercise(id,{restoreTabState=false}={}){
     workoutScroll=Math.max(0,Number(tabViewState.workout.scrollY)||0);
   }
   const snapshot=captureWorkoutSnapshot();
+  if(!restoreTabState && history.state?.formFirstView!=='detail'){
+    try { history.pushState({ formFirstView:'detail', exerciseId:id },'',location.href); } catch { /* History is optional in embedded contexts. */ }
+  }
   currentView='detail'; currentExerciseId=id;
+  document.body.classList.add('detail-view');
   tabViewState.workout.subview='detail';
   tabViewState.workout.exerciseId=id;
   const completed=state.completed[id] || Array(ex.sets).fill(false);
@@ -406,18 +423,15 @@ function openExercise(id,{restoreTabState=false}={}){
   const underlayBody=app.querySelector('.edge-back-underlay-body');
   if(underlayBody) underlayBody.style.transform=`translate3d(0,${-workoutScroll}px,0)`;
 
-  document.getElementById('backBtn').addEventListener('click',()=>renderWorkout({restore:true}));
+  document.getElementById('backBtn').addEventListener('click',goBackToWorkout);
   document.getElementById('moreBtn').addEventListener('click',openSettings);
   document.getElementById('logGateCard')?.addEventListener('click',()=>renderProgress());
   app.querySelectorAll('[data-log]').forEach(input=>input.addEventListener('change',saveLog));
   app.querySelectorAll('[data-check]').forEach(btn=>btn.addEventListener('click',()=>toggleSet(ex,Number(btn.dataset.check),btn)));
   document.getElementById('watchFormBtn')?.addEventListener('click',()=>openFormGuide(ex, { showToast }));
-  if(restoreTabState){
-    const top=Math.max(0,Number(tabViewState.workout.detailScrollY)||0);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top,behavior:'instant'})));
-  } else {
-    window.scrollTo({top:0,behavior:'instant'});
-  }
+  app.scrollTop = 0;
+  const detailTop=restoreTabState ? tabViewState.workout.detailScrollY : 0;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>restoreDetailScroll(detailTop)));
 }
 
 
@@ -523,10 +537,40 @@ function openSettings(){
       save();
       applyTheme(enabled,true);
     },
-    onDevelopmentModeChange:enabled=>{
+    onDevelopmentModeChange:async enabled=>{
       state.developmentMode=enabled;
       save();
       syncDevelopmentModeUI();
+
+      // Development Mode is the single user-facing switch for both the
+      // check-in bypass and background push subscription, when configured.
+      try {
+        if (enabled && isWebPushConfigured() && !state.webPushEnabled) {
+          const result = await enableWebPush();
+          state.webPushEnabled = Boolean(result.ok);
+          if (!result.ok && result.reason !== 'server-not-configured') {
+            const message = result.reason === 'install-required'
+              ? 'Add Form First to the Home Screen to enable notifications'
+              : result.reason === 'denied'
+                ? 'Notifications are blocked in iPhone Settings'
+                : 'Push notifications are unavailable on this device';
+            showToast(message, 'info');
+          }
+        } else if (!enabled && state.webPushEnabled) {
+          const result = await disableWebPush();
+          if (result.ok) state.webPushEnabled = false;
+          else showToast('Could not turn off push notifications', 'info');
+        } else if (enabled && !isWebPushConfigured()) {
+          // Keep Development Mode useful on its own; push delivery becomes
+          // active automatically when the VAPID server configuration is added.
+          state.webPushEnabled = false;
+          showToast('Push notifications need server setup', 'info');
+        }
+      } catch (error) {
+        console.warn('Push notification update from Development Mode failed', error);
+        showToast('Push notifications could not be updated', 'info');
+      }
+      save();
     },
     onWaterReminderChange:async({button,copy,enabled})=>{
       if(enabled) waterReminders.disable(button,copy);
@@ -542,11 +586,19 @@ function openSettings(){
   });
 }
 
+function goBackToWorkout(){
+  if(history.state?.formFirstView==='detail' && history.length>1){ history.back(); return; }
+  renderWorkout({restore:true});
+}
+
 window.addEventListener('popstate',()=>{ if(currentView==='detail') renderWorkout({restore:true}); });
 document.querySelectorAll('#bottomNav [data-nav]').forEach(btn=>btn.addEventListener('click',()=>{
   const view=btn.dataset.nav;
   if(currentView===view) return;
   captureTabViewState();
+  if(currentView==='detail' && history.state?.formFirstView==='detail'){
+    try { history.replaceState({ formFirstView:'root' },'',location.href); } catch { /* History is optional. */ }
+  }
   if(view==='workout') restoreWorkoutTabState();
   if(view==='progress') renderProgress({restoreTabState:true});
   if(view==='timer') renderTimer({restoreTabState:true});
@@ -560,6 +612,8 @@ window.addEventListener('focus',()=>{ if(state.waterReminderEnabled) waterRemind
 installEdgeBackGesture({
   app,
   getCurrentView: () => currentView,
-  onBack: () => renderWorkout({ restore: true })
+  onBack: goBackToWorkout
 });
 renderWorkout();
+document.documentElement.classList.add('app-ready');
+window.dispatchEvent(new CustomEvent('formfirst:ready'));

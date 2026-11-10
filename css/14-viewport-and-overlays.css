@@ -1,0 +1,208 @@
+/* v40: one bounded app viewport, stable tab bar, and interactive settings sheet. */
+:root {
+  --app-canvas: #fffdf6;
+  --bottom-nav-h: 56px;
+}
+
+html[data-theme="dark"] {
+  --app-canvas: #11110f;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  background: var(--app-canvas) !important;
+}
+
+body {
+  height: 100dvh;
+  min-height: 100dvh;
+  padding: 0 !important;
+  color-scheme: light;
+  background: var(--app-canvas) !important;
+}
+
+html[data-theme="dark"] body {
+  color-scheme: dark;
+}
+
+/* The app element is the only vertical scroll container for the three tabs.
+   This keeps the document itself fixed to the physical viewport. */
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0 !important;
+  max-height: 100dvh;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: none;
+  background: transparent;
+}
+
+#app::-webkit-scrollbar {
+  display: none;
+}
+
+#app > .screen {
+  min-height: 100dvh;
+}
+
+body.detail-view #app,
+body.settings-open #app,
+body.form-webview-open #app {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* iOS standalone mode draws the page canvas behind the system status bar.
+   The topbar reserves the safe-area inset so its controls remain below icons. */
+body::before {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: var(--safe-top, env(safe-area-inset-top, 0px));
+  background: var(--app-canvas);
+  pointer-events: none;
+}
+
+.topbar,
+.note-topbar {
+  background: rgba(255, 253, 245, .78) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.35) !important;
+  backdrop-filter: blur(24px) saturate(1.35) !important;
+}
+
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .note-topbar {
+  background: rgba(17, 17, 15, .76) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(1.35) !important;
+  backdrop-filter: blur(24px) saturate(1.35) !important;
+}
+
+/* Keep the tab bar mounted and stationary under the settings overlay. The
+   overlay dims it naturally; opening/closing Settings never animates the bar. */
+.note-bottom-nav,
+#bottomNav {
+  z-index: 2000 !important;
+  height: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  min-height: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  padding: 2px 12px var(--safe-bottom) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translate3d(-50%, 0, 0) !important;
+  transition: none !important;
+}
+
+.nav-item,
+.nav-item.active {
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-item .nav-icon,
+.nav-item.active .nav-icon,
+.nav-item .nav-icon img,
+.nav-item.active .nav-icon img {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+/* Settings is a modal layer above the unchanged app and tab bar. */
+.settings-overlay {
+  z-index: 2200 !important;
+  padding-top: var(--safe-top, env(safe-area-inset-top, 0px));
+  padding-bottom: 0;
+  --settings-backdrop-alpha: 0;
+  --settings-backdrop-blur: 0px;
+  background: rgba(0, 0, 0, var(--settings-backdrop-alpha)) !important;
+  -webkit-backdrop-filter: blur(var(--settings-backdrop-blur)) !important;
+  backdrop-filter: blur(var(--settings-backdrop-blur)) !important;
+  transition: background-color .42s cubic-bezier(.32, .72, 0, 1), -webkit-backdrop-filter .42s cubic-bezier(.32, .72, 0, 1), backdrop-filter .42s cubic-bezier(.32, .72, 0, 1) !important;
+}
+
+.settings-overlay.show {
+  --settings-backdrop-alpha: .20;
+  --settings-backdrop-blur: 2px;
+}
+
+html[data-theme="dark"] .settings-overlay.show {
+  --settings-backdrop-alpha: .42;
+}
+
+.settings-overlay.closing {
+  --settings-backdrop-alpha: 0;
+  --settings-backdrop-blur: 0px;
+}
+
+body.settings-open #bottomNav {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translate3d(-50%, 0, 0) !important;
+}
+
+.settings-overlay .settings-sheet {
+  --settings-sheet-offset: 100%;
+  transform: translate3d(0, var(--settings-sheet-offset), 0) !important;
+  transition:
+    transform .42s cubic-bezier(.32, .72, 0, 1),
+    opacity .42s cubic-bezier(.32, .72, 0, 1) !important;
+  will-change: transform;
+}
+
+.settings-overlay.show .settings-sheet {
+  --settings-sheet-offset: 0px;
+  transform: translate3d(0, var(--settings-sheet-offset), 0) !important;
+}
+
+.settings-overlay.closing .settings-sheet {
+  --settings-sheet-offset: 100%;
+  transform: translate3d(0, var(--settings-sheet-offset), 0) !important;
+}
+
+.settings-overlay .settings-sheet.is-dragging {
+  transition: none !important;
+  will-change: transform;
+}
+
+.settings-overlay .settings-sheet.is-snapping-back {
+  transition: transform .34s cubic-bezier(.22, 1, .36, 1), opacity .28s ease !important;
+}
+
+.settings-overlay .settings-grabber,
+.settings-overlay .settings-header {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.settings-overlay .settings-header button {
+  touch-action: manipulation;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-overlay,
+  .settings-overlay .settings-sheet,
+  .note-bottom-nav,
+  .nav-item,
+  .nav-item .nav-icon {
+    transition: none !important;
+    animation: none !important;
+  }
+}

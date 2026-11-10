@@ -10,6 +10,5 @@ export function applyTheme(isDark, animate = true) {
 
   root.dataset.theme = isDark ? 'dark' : 'light';
   root.style.colorScheme = isDark ? 'dark' : 'light';
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#11110f' : '#fffdf6');
-  document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')?.setAttribute('content', isDark ? 'black-translucent' : 'default');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#141410' : '#fffef9');
 }

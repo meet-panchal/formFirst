@@ -308,7 +308,6 @@ html[data-theme="dark"] .settings-header h2,
 html[data-theme="dark"] .settings-row-copy strong,
 html[data-theme="dark"] .week-reset-copy strong{color:var(--ff-dark-text)!important}
 html[data-theme="dark"] .settings-row-copy small,
-html[data-theme="dark"] .settings-dev-note,
 html[data-theme="dark"] .week-reset-copy small{color:#aca59b!important}
 html[data-theme="dark"] .settings-group{background:#22211d!important;border-color:rgba(255,255,255,.08)!important;box-shadow:none!important}
 html[data-theme="dark"] .settings-row+ .settings-row{border-color:rgba(255,255,255,.08)!important}
@@ -387,9 +386,7 @@ html[data-theme="dark"] .set-progress-copy>span{color:var(--ff-dark-secondary)!i
 html[data-theme="dark"] .set-progress-chip.is-complete .set-progress-copy>span{color:#111!important}
 
 /* Light-mode legibility polish surfaced by the comparison audit. */
-.settings-dev-note{color:#6f695f!important}
 .dev-mode-caption{color:#875900!important}
-html[data-theme="dark"] .settings-dev-note{color:#aca59b!important}
 html[data-theme="dark"] .dev-mode-caption{color:#f3bd4b!important}
 
 /* === Dark-mode refinement pass: borders, day/night toggle, destructive action === */
@@ -536,7 +533,6 @@ html[data-theme="dark"] .day-complete-mark{
 /* === Targeted dark-mode QA fixes: settings labels, flame tile, exercise detail visibility === */
 /* Settings is concise: no group headings above individual settings. */
 .settings-group + .settings-group{margin-top:10px!important}
-.settings-dev-note + .settings-group{margin-top:10px!important}
 
 /* Weekly flame keeps the original yellow tile but now has the same outlined motif as the app. */
 .week-goal-icon{

@@ -10,6 +10,7 @@ export function openSettingsSheet({
   onResetWeek
 }) {
   document.querySelector('.settings-overlay')?.remove();
+  document.body.classList.remove('settings-open');
 
   const overlay = document.createElement('div');
   overlay.className = 'settings-overlay';
@@ -32,7 +33,7 @@ export function openSettingsSheet({
       </div>
     </div>
     <div class="settings-group">
-      <div class="settings-row"><div class="settings-row-copy"><strong>Development Mode</strong><small>Allow set logging without check-in.</small></div><button class="ios-switch ${state.developmentMode ? 'is-on' : ''}" id="developmentModeToggle" role="switch" aria-checked="${state.developmentMode}"><span></span></button></div>
+      <div class="settings-row"><div class="settings-row-copy"><strong>Development Mode</strong><small>Allow set logging without check-in.</small></div><button class="ios-switch ${state.developmentMode ? 'is-on' : ''}" id="developmentModeToggle" type="button" role="switch" aria-checked="${state.developmentMode}" aria-label="Development Mode (also controls push notifications when configured)"><span></span></button></div>
     </div>
     ${state.developmentMode ? '<div class="settings-dev-note">Development Mode bypasses the gym check-in gate. Turn it off for normal workout tracking.</div>' : ''}
     <div class="settings-group">
@@ -43,6 +44,7 @@ export function openSettingsSheet({
       <div class="week-reset-confirm" id="weekResetConfirm" hidden><div class="week-reset-copy"><strong>Reset this week?</strong><small>Older weekly completion history stays saved. This week's progress starts from zero.</small></div><div class="week-reset-actions"><button type="button" class="week-reset-cancel" id="weekResetCancel">Cancel</button><button type="button" class="week-reset-go" id="weekResetGo">Start New Week</button></div></div>
     </div>
   </div>`;
+  document.body.classList.add('settings-open');
   document.body.appendChild(overlay);
   requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('show')));
 
@@ -54,16 +56,25 @@ export function openSettingsSheet({
     if (overlay.classList.contains('closing')) return;
     overlay.classList.add('closing');
     overlay.classList.remove('show');
-    closeTimer = window.setTimeout(() => overlay.remove(), 430);
+    sheet?.classList.remove('is-dragging', 'is-snapping-back');
+    sheet?.style.setProperty('--settings-sheet-offset', '100%');
+    sheet?.style.removeProperty('opacity');
+    overlay.style.setProperty('--settings-backdrop-alpha', '0');
+    overlay.style.setProperty('--settings-backdrop-blur', '0px');
+    closeTimer = window.setTimeout(() => {
+      overlay.remove();
+      if (!document.querySelector('.settings-overlay')) {
+        document.body.classList.remove('settings-open');
+      }
+    }, 430);
   };
 
   const resetDragStyles = () => {
     sheet?.classList.remove('is-dragging');
-    sheet?.style.removeProperty('transform');
     sheet?.style.removeProperty('opacity');
-    overlay.style.removeProperty('background');
-    overlay.style.removeProperty('backdrop-filter');
-    overlay.style.removeProperty('-webkit-backdrop-filter');
+    sheet?.style.setProperty('--settings-sheet-offset', '0px');
+    overlay.style.removeProperty('--settings-backdrop-alpha');
+    overlay.style.removeProperty('--settings-backdrop-blur');
   };
 
   const dragStart = event => {
@@ -86,36 +97,48 @@ export function openSettingsSheet({
 
     event.preventDefault();
     const progress = Math.min(1, distance / Math.max(220, sheet.offsetHeight * 0.52));
-    sheet.style.setProperty('transform', `translate3d(0,${distance}px,0)`, 'important');
+    sheet.style.setProperty('--settings-sheet-offset', `${distance}px`);
     sheet.style.setProperty('opacity', String(1 - progress * 0.08), 'important');
     const maxShade = state.darkMode ? 0.42 : 0.20;
-    overlay.style.setProperty('background', `rgba(0,0,0,${Math.max(0, maxShade * (1 - progress))})`, 'important');
-    overlay.style.setProperty('backdrop-filter', `blur(${Math.max(0, 2 * (1 - progress))}px)`, 'important');
-    overlay.style.setProperty('-webkit-backdrop-filter', `blur(${Math.max(0, 2 * (1 - progress))}px)`, 'important');
+    overlay.style.setProperty('--settings-backdrop-alpha', String(Math.max(0, maxShade * (1 - progress))));
+    overlay.style.setProperty('--settings-backdrop-blur', `${Math.max(0, 2 * (1 - progress))}px`);
   };
 
   const dragEnd = event => {
     if (!drag || event.pointerId !== drag.id || !sheet) return;
+    const cancelled = event.type === 'pointercancel';
     const elapsed = Math.max(1, performance.now() - drag.startedAt);
     const velocity = drag.distance / elapsed;
-    const shouldClose = drag.distance > Math.min(118, sheet.offsetHeight * 0.22) || velocity > 0.58;
+    const shouldClose = !cancelled && (
+      drag.distance > Math.min(118, sheet.offsetHeight * 0.22)
+      || (velocity > 0.58 && drag.distance > 36)
+    );
     drag = null;
-    resetDragStyles();
 
     if (shouldClose) {
+      sheet.classList.remove('is-dragging');
+      sheet.style.removeProperty('opacity');
+      sheet.style.setProperty('--settings-sheet-offset', '100%');
       softHaptic(4);
       close();
       return;
     }
 
+    resetDragStyles();
     sheet.classList.add('is-snapping-back');
-    window.setTimeout(() => sheet.classList.remove('is-snapping-back'), 340);
+    window.setTimeout(() => sheet.classList.remove('is-snapping-back'), 360);
   };
 
-  sheet?.addEventListener('pointerdown', dragStart);
-  sheet?.addEventListener('pointermove', dragMove, { passive: false });
-  sheet?.addEventListener('pointerup', dragEnd);
-  sheet?.addEventListener('pointercancel', dragEnd);
+  const dragSurfaces = [
+    overlay.querySelector('.settings-grabber'),
+    overlay.querySelector('.settings-header')
+  ].filter(Boolean);
+  dragSurfaces.forEach(surface => {
+    surface.addEventListener('pointerdown', dragStart);
+    surface.addEventListener('pointermove', dragMove, { passive: false });
+    surface.addEventListener('pointerup', dragEnd);
+    surface.addEventListener('pointercancel', dragEnd);
+  });
 
   overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
   overlay.querySelector('#settingsClose')?.addEventListener('click', close);
@@ -129,13 +152,22 @@ export function openSettingsSheet({
     onDarkModeChange?.(enabled);
   });
 
-  overlay.querySelector('#developmentModeToggle')?.addEventListener('click', event => {
+  overlay.querySelector('#developmentModeToggle')?.addEventListener('click', async event => {
     const enabled = !state.developmentMode;
     const button = event.currentTarget;
+    button.disabled = true;
     button.classList.toggle('is-on', enabled);
     button.setAttribute('aria-checked', String(enabled));
     softHaptic(6);
-    onDevelopmentModeChange?.(enabled);
+    try {
+      await onDevelopmentModeChange?.(enabled);
+    } catch (error) {
+      button.classList.toggle('is-on', state.developmentMode);
+      button.setAttribute('aria-checked', String(state.developmentMode));
+      console.warn('Development mode update failed', error);
+    } finally {
+      button.disabled = false;
+    }
   });
 
   overlay.querySelector('#waterReminderToggle')?.addEventListener('click', async event => {
@@ -170,5 +202,8 @@ export function openSettingsSheet({
   return () => {
     if (closeTimer) clearTimeout(closeTimer);
     overlay.remove();
+    if (!document.querySelector('.settings-overlay')) {
+      document.body.classList.remove('settings-open');
+    }
   };
 }

@@ -6,7 +6,7 @@ import { softHaptic } from './haptics.js';
 let dismissTimer = null;
 let removeTimer = null;
 
-export function dismissFeedbackNotice() {
+export function dismissFeedbackNotice({ swiped = false } = {}) {
   if (dismissTimer) {
     clearTimeout(dismissTimer);
     dismissTimer = null;
@@ -15,7 +15,14 @@ export function dismissFeedbackNotice() {
   const banner = document.getElementById('recoveryRewardBanner');
   if (!banner) return;
 
-  banner.classList.remove('show');
+  banner.style.removeProperty('transform');
+  banner.style.removeProperty('opacity');
+  banner.style.removeProperty('transition');
+  if (swiped) {
+    banner.classList.add('is-swiped-away');
+  } else {
+    banner.classList.remove('show');
+  }
   if (removeTimer) clearTimeout(removeTimer);
   removeTimer = window.setTimeout(() => {
     banner.remove();
@@ -35,7 +42,42 @@ function replaceNotice({ className, role = 'status', ariaLive = 'polite', markup
   banner.innerHTML = markup;
   document.body.appendChild(banner);
 
-  banner.querySelector('.recovery-reward-close')?.addEventListener('click', dismissFeedbackNotice);
+  // Match iOS notification behavior: no close affordance; swipe the notice up to dismiss.
+  let swipe = null;
+  banner.addEventListener('pointerdown', event => {
+    if (event.pointerType === 'mouse' || event.button !== 0 || event.target.closest('button, a, input')) return;
+    swipe = { id: event.pointerId, startY: event.clientY, currentY: event.clientY, startedAt: performance.now(), moved: false };
+    try { banner.setPointerCapture(event.pointerId); } catch { /* Pointer capture is optional. */ }
+  });
+  banner.addEventListener('pointermove', event => {
+    if (!swipe || swipe.id !== event.pointerId) return;
+    const deltaY = event.clientY - swipe.startY;
+    if (deltaY >= 0) return;
+    swipe.currentY = event.clientY;
+    swipe.moved = Math.abs(deltaY) > 6;
+    if (!swipe.moved) return;
+    event.preventDefault();
+    banner.style.transition = 'none';
+    banner.style.transform = `translate3d(-50%, ${deltaY}px, 0) scale(${Math.max(.94, 1 - Math.abs(deltaY) / 700)})`;
+    banner.style.opacity = String(Math.max(0, 1 - Math.abs(deltaY) / 110));
+  });
+  const finishSwipe = event => {
+    if (!swipe || swipe.id !== event.pointerId) return;
+    const current = swipe;
+    swipe = null;
+    const deltaY = current.currentY - current.startY;
+    const elapsed = Math.max(1, performance.now() - current.startedAt);
+    const upwardVelocity = Math.max(0, -deltaY / elapsed);
+    if (deltaY <= -48 || (deltaY <= -24 && upwardVelocity > .35)) {
+      dismissFeedbackNotice({ swiped: true });
+      return;
+    }
+    banner.style.removeProperty('transform');
+    banner.style.removeProperty('opacity');
+    banner.style.removeProperty('transition');
+  };
+  banner.addEventListener('pointerup', finishSwipe);
+  banner.addEventListener('pointercancel', finishSwipe);
   requestAnimationFrame(() => banner.classList.add('show'));
   if (haptic) softHaptic(haptic);
 
@@ -108,7 +150,6 @@ export function showAppNotice({
           <strong>${title}</strong>
           <span>${message}</span>
         </div>
-        <button class="recovery-reward-close" type="button" aria-label="Dismiss">${ICON.close}</button>
       </div>
       <div class="recovery-reward-progress app-feedback-generic-body ${actionLabel ? 'has-action' : ''}">
         <span class="recovery-reward-next">${footnote || (kind === 'success' ? 'Saved in Form First' : 'Your current page and workout state are preserved.')}</span>
@@ -185,7 +226,6 @@ export function showGymCheckInNotice({
           <strong>${title}</strong>
           <span>${supporting}</span>
         </div>
-        <button class="recovery-reward-close" type="button" aria-label="Dismiss">${ICON.close}</button>
       </div>
       <div class="recovery-reward-progress app-feedback-progress ${isSuccess ? '' : 'is-retry'}">
         <div class="app-feedback-metrics" aria-label="Check-in details">${metrics}</div>
@@ -219,7 +259,6 @@ export function showRecoveryRewardNotice({ durationSeconds, dayNumber, stats, on
           <strong>Ready for your next set</strong>
           <span>${durationSeconds}s rest finished</span>
         </div>
-        <button class="recovery-reward-close" type="button" aria-label="Dismiss">${ICON.close}</button>
       </div>
       <div class="recovery-reward-progress" aria-label="Day ${dayNumber} workout progress">
         <div class="recovery-reward-progress-row"><span>Day ${dayNumber}</span><strong>${stats.done}/${stats.total} sets</strong></div>

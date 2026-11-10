@@ -1,0 +1,368 @@
+/* v42 — iOS Clock-inspired floating navigation and continuous top chrome.
+   Navigation stays a distinct functional layer; page content scrolls beneath it. */
+
+:root {
+  --ff-floating-nav-height: 68px;
+  --ff-floating-nav-inset: 12px;
+  --ff-floating-nav-width: 540px;
+  --ff-glass-light: rgba(255, 253, 246, .78);
+  --ff-glass-light-edge: rgba(255, 255, 255, .72);
+  --ff-glass-light-shadow: 0 12px 34px rgba(44, 35, 18, .13), inset 0 1px 0 rgba(255, 255, 255, .72);
+  --ff-glass-active-light: rgba(17, 17, 17, .075);
+  --ff-top-glass-0: rgba(255, 253, 246, .92);
+  --ff-top-glass-1: rgba(255, 253, 246, .76);
+  --ff-top-glass-2: rgba(255, 253, 246, .24);
+}
+
+html[data-theme="dark"] {
+  --ff-glass-light: rgba(27, 26, 23, .80);
+  --ff-glass-light-edge: rgba(216, 211, 201, .20);
+  --ff-glass-light-shadow: 0 12px 34px rgba(0, 0, 0, .34), inset 0 1px 0 rgba(216, 211, 201, .08);
+  --ff-glass-active-light: rgba(255, 255, 255, .105);
+  --ff-top-glass-0: rgba(20, 20, 16, .94);
+  --ff-top-glass-1: rgba(20, 20, 16, .78);
+  --ff-top-glass-2: rgba(20, 20, 16, .26);
+}
+
+/* The system status bar remains native. The page canvas and theme-color meta
+   provide its matching surface; controls never enter the status-bar safe area. */
+html,
+body,
+#app {
+  background: var(--ff-page-gradient) !important;
+}
+
+body {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+#app {
+  padding: 0 0 calc(var(--ff-floating-nav-height) + var(--ff-floating-nav-inset) + var(--safe-bottom) + 26px) !important;
+  scroll-padding-bottom: calc(var(--ff-floating-nav-height) + var(--ff-floating-nav-inset) + var(--safe-bottom) + 26px);
+}
+
+/* Floating Settings / Back toolbar. Its gradient begins behind the status area
+   and fades into the page, rather than creating a separate opaque header slab. */
+.topbar,
+.note-topbar,
+.workout-topbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1200 !important;
+  isolation: isolate;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 66px) !important;
+  min-height: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 66px) !important;
+  padding: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 8px) 18px 8px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.topbar::before,
+.note-topbar::before,
+.workout-topbar::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: calc(-1 * var(--safe-top, env(safe-area-inset-top, 0px)));
+  left: 0;
+  right: 0;
+  height: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 126px);
+  background: linear-gradient(
+    180deg,
+    var(--ff-top-glass-0) 0%,
+    var(--ff-top-glass-1) 48%,
+    var(--ff-top-glass-2) 76%,
+    rgba(255, 253, 246, 0) 100%
+  );
+  -webkit-backdrop-filter: blur(22px) saturate(1.38);
+  backdrop-filter: blur(22px) saturate(1.38);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+}
+
+html[data-theme="dark"] .topbar::before,
+html[data-theme="dark"] .note-topbar::before,
+html[data-theme="dark"] .workout-topbar::before {
+  background: linear-gradient(
+    180deg,
+    var(--ff-top-glass-0) 0%,
+    var(--ff-top-glass-1) 48%,
+    var(--ff-top-glass-2) 76%,
+    rgba(20, 20, 16, 0) 100%
+  );
+}
+
+.topbar > *,
+.note-topbar > *,
+.workout-topbar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.topbar-spacer {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 50px !important;
+}
+
+.topbar .icon-btn,
+.note-topbar .icon-btn,
+.workout-topbar .icon-btn {
+  flex: 0 0 50px !important;
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  min-height: 50px !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid rgba(17, 17, 17, .105) !important;
+  border-radius: 50% !important;
+  color: #171714 !important;
+  background: rgba(255, 255, 255, .54) !important;
+  box-shadow:
+    0 7px 22px rgba(43, 34, 18, .10),
+    inset 0 1px 0 rgba(255, 255, 255, .78) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.45) !important;
+  backdrop-filter: blur(22px) saturate(1.45) !important;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .18s cubic-bezier(.2, .8, .2, 1), background-color .18s ease, box-shadow .18s ease !important;
+}
+
+.topbar .icon-btn svg,
+.note-topbar .icon-btn svg,
+.workout-topbar .icon-btn svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.topbar .icon-btn:active,
+.note-topbar .icon-btn:active,
+.workout-topbar .icon-btn:active {
+  transform: scale(.94) !important;
+  background: rgba(255, 255, 255, .76) !important;
+}
+
+html[data-theme="dark"] .topbar .icon-btn,
+html[data-theme="dark"] .note-topbar .icon-btn,
+html[data-theme="dark"] .workout-topbar .icon-btn {
+  color: #f2eee5 !important;
+  border-color: rgba(216, 211, 201, .20) !important;
+  background: rgba(44, 42, 36, .72) !important;
+  box-shadow:
+    0 7px 22px rgba(0, 0, 0, .28),
+    inset 0 1px 0 rgba(216, 211, 201, .10) !important;
+}
+
+html[data-theme="dark"] .topbar .icon-btn:active,
+html[data-theme="dark"] .note-topbar .icon-btn:active,
+html[data-theme="dark"] .workout-topbar .icon-btn:active {
+  background: rgba(58, 55, 48, .88) !important;
+}
+
+/* Clock-inspired floating tab capsule. The supplied PNG icons are untouched. */
+.note-bottom-nav,
+#bottomNav {
+  position: fixed !important;
+  z-index: 2000 !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: calc(var(--safe-bottom, env(safe-area-inset-bottom, 0px)) + var(--ff-floating-nav-inset)) !important;
+  width: min(calc(100% - 28px), var(--ff-floating-nav-width)) !important;
+  height: var(--ff-floating-nav-height) !important;
+  min-height: var(--ff-floating-nav-height) !important;
+  max-height: var(--ff-floating-nav-height) !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  gap: 6px !important;
+  padding: 6px 8px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid var(--ff-glass-light-edge) !important;
+  border-radius: 999px !important;
+  background: var(--ff-glass-light) !important;
+  box-shadow: var(--ff-glass-light-shadow) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.62) !important;
+  backdrop-filter: blur(28px) saturate(1.62) !important;
+  transform: translate3d(-50%, 0, 0) !important;
+  transition: opacity .22s ease, transform .24s cubic-bezier(.2, .8, .2, 1) !important;
+  isolation: isolate;
+}
+
+.nav-item,
+.nav-item.active {
+  position: relative !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  color: inherit !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .18s ease, transform .18s cubic-bezier(.2, .8, .2, 1) !important;
+}
+
+.nav-item.active {
+  background: var(--ff-glass-active-light) !important;
+}
+
+.nav-item::after,
+.nav-item.active::after {
+  display: none !important;
+  content: none !important;
+}
+
+.nav-item .nav-icon,
+.nav-item.active .nav-icon,
+.nav-item .nav-icon img,
+.nav-item.active .nav-icon img {
+  display: grid !important;
+  place-items: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+  object-fit: contain !important;
+  filter: none !important;
+}
+
+.nav-item:active {
+  transform: scale(.96) !important;
+}
+
+html[data-theme="dark"] .note-bottom-nav,
+html[data-theme="dark"] #bottomNav {
+  border-color: rgba(216, 211, 201, .20) !important;
+  background: rgba(27, 26, 23, .82) !important;
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, .38),
+    inset 0 1px 0 rgba(216, 211, 201, .09) !important;
+}
+
+html[data-theme="dark"] .nav-item.active {
+  background: rgba(255, 255, 255, .11) !important;
+}
+
+/* Leave a real scroll buffer beneath the floating capsule. */
+body.edge-back-gesture-active .note-bottom-nav,
+body.edge-back-gesture-active #bottomNav {
+  left: 50% !important;
+  right: auto !important;
+  bottom: calc(var(--safe-bottom, env(safe-area-inset-bottom, 0px)) + var(--ff-floating-nav-inset)) !important;
+  width: min(calc(100% - 28px), var(--ff-floating-nav-width)) !important;
+  transform: translate3d(-50%, 0, 0) !important;
+  transition: none !important;
+}
+
+body,
+#app {
+  padding-bottom: 0 !important;
+}
+
+.note-workout-container,
+.nav-page-container {
+  padding-bottom: calc(28px + var(--ff-floating-nav-height) + var(--ff-floating-nav-inset) + var(--safe-bottom)) !important;
+}
+
+.note-detail-content {
+  padding-bottom: calc(24px + var(--ff-floating-nav-height) + var(--ff-floating-nav-inset) + var(--safe-bottom)) !important;
+}
+
+body.detail-view #app {
+  padding-bottom: 0 !important;
+}
+
+/* Keep the native home-indicator area clear and visually continuous. */
+html,
+body {
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (max-width: 370px) {
+  :root {
+    --ff-floating-nav-height: 64px;
+    --ff-floating-nav-inset: 9px;
+  }
+  .note-bottom-nav,
+  #bottomNav {
+    width: calc(100% - 22px) !important;
+    gap: 4px !important;
+    padding: 5px 6px !important;
+  }
+  .nav-item .nav-icon,
+  .nav-item.active .nav-icon,
+  .nav-item .nav-icon img,
+  .nav-item.active .nav-icon img {
+    width: 35px !important;
+    height: 35px !important;
+    min-width: 35px !important;
+    min-height: 35px !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .note-bottom-nav,
+  #bottomNav {
+    background: rgba(255, 253, 246, .97) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .topbar::before,
+  .note-topbar::before,
+  .workout-topbar::before {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html[data-theme="dark"] .note-bottom-nav,
+  html[data-theme="dark"] #bottomNav {
+    background: rgba(27, 26, 23, .97) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-bottom-nav,
+  #bottomNav,
+  .nav-item,
+  .topbar .icon-btn,
+  .note-topbar .icon-btn,
+  .workout-topbar .icon-btn {
+    transition: none !important;
+    animation: none !important;
+  }
+}

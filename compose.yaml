@@ -2,8 +2,12 @@ services:
   app:
     image: node:24-bookworm-slim
     working_dir: /workspace
+
     volumes:
       - .:/workspace
+
     ports:
-      - "5173:5173"
-    command: node scripts/serve.cjs
+      - "127.0.0.1:5173:5173"
+      - "127.0.0.1:4173:4173"
+
+    command: sleep infinity

@@ -1,57 +1,86 @@
 (() => {
-  const SPLASH_SESSION_KEY = 'formfirst-brand-splash-shown';
-  const MAX_SPLASH_MS = 2_800;
-
+  const MAX_SPLASH_WAIT_MS = 10_000;
+  const FALLBACK_HOLD_MS = 360;
   const splash = document.getElementById('brandSplash');
   const video = document.getElementById('brandSplashVideo');
   if (!splash || !video) return;
 
-  const reducedMotion = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
   const standalone = Boolean(
     window.matchMedia?.('(display-mode: standalone)').matches
     || window.navigator.standalone === true
   );
-
-  const readSplashShown = () => {
-    try { return sessionStorage.getItem(SPLASH_SESSION_KEY) === '1'; }
-    catch { return false; }
-  };
-
-  const markSplashShown = () => {
-    try { sessionStorage.setItem(SPLASH_SESSION_KEY, '1'); }
-    catch { /* Session storage is optional for the launch experience. */ }
-  };
-
-  if (!standalone || readSplashShown()) {
+  if (!standalone) {
     splash.hidden = true;
     return;
   }
 
-  markSplashShown();
-
+  const reducedMotion = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  let appReady = document.documentElement.classList.contains('app-ready');
+  let visualReady = false;
+  let fallbackFrame = false;
   let finished = false;
   let fallbackTimer = null;
-  const finish = () => {
-    if (finished) return;
+  let maximumTimer = null;
+
+  const finishWhenReady = () => {
+    if (finished || !appReady || !visualReady) return;
     finished = true;
-    if (fallbackTimer) clearTimeout(fallbackTimer);
-    splash.classList.add('show-final');
-    window.setTimeout(() => splash.classList.add('is-leaving'), reducedMotion ? 220 : 120);
-    window.setTimeout(() => splash.remove(), reducedMotion ? 380 : 520);
+    clearTimeout(fallbackTimer);
+    clearTimeout(maximumTimer);
+
+    // Keep the final decoded video frame under the fade. Swapping to a separate
+    // PNG at this point caused a visible one-frame jump on iPhone.
+    if (fallbackFrame) splash.classList.add('show-final');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      splash.classList.add('is-leaving');
+      window.setTimeout(() => splash.remove(), 360);
+    }));
   };
 
+  const markVisualReady = ({ useFallback = false } = {}) => {
+    if (visualReady) return;
+    visualReady = true;
+    fallbackFrame = useFallback;
+    if (useFallback) {
+      video.pause();
+      splash.classList.add('show-final');
+      fallbackTimer = window.setTimeout(finishWhenReady, FALLBACK_HOLD_MS);
+      return;
+    }
+    finishWhenReady();
+  };
+
+  const onAppReady = () => {
+    appReady = true;
+    finishWhenReady();
+  };
+  window.addEventListener('formfirst:ready', onAppReady, { once: true });
+
   if (reducedMotion) {
-    fallbackTimer = window.setTimeout(finish, 420);
-    return;
+    markVisualReady({ useFallback: true });
+  } else {
+    video.addEventListener('ended', () => markVisualReady(), { once: true });
+    video.addEventListener('error', () => markVisualReady({ useFallback: true }), { once: true });
+    video.addEventListener('playing', () => {
+      clearTimeout(fallbackTimer);
+      // The hard stop is a recovery guard for a stalled decoder, not the normal
+      // splash duration. A successful video is allowed to reach its end event.
+      maximumTimer = window.setTimeout(() => markVisualReady({ useFallback: true }), MAX_SPLASH_WAIT_MS);
+    }, { once: true });
+
+    maximumTimer = window.setTimeout(() => markVisualReady({ useFallback: true }), MAX_SPLASH_WAIT_MS);
+    try {
+      video.currentTime = 0;
+      const playback = video.play();
+      playback?.catch?.(() => markVisualReady({ useFallback: true }));
+    } catch {
+      markVisualReady({ useFallback: true });
+    }
   }
 
-  video.addEventListener('ended', finish, { once: true });
-  video.addEventListener('error', finish, { once: true });
-
-  fallbackTimer = window.setTimeout(finish, MAX_SPLASH_MS);
-  const playback = video.play();
-  playback?.catch?.(() => {
-    if (fallbackTimer) clearTimeout(fallbackTimer);
-    fallbackTimer = window.setTimeout(finish, 700);
-  });
+  // The module app normally signals readiness after its first render. This
+  // additional guard prevents a broken import from leaving the launch layer up.
+  window.setTimeout(() => {
+    if (!appReady) onAppReady();
+  }, 12_000);
 })();

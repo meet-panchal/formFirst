@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'form-first-';
-const CACHE_NAME = `${CACHE_PREFIX}v36`;
+const CACHE_NAME = `${CACHE_PREFIX}v44`;
 const APP_SHELL = [
   './',
   './index.html',
@@ -22,6 +22,10 @@ const APP_SHELL = [
   './css/10-feedback.css',
   './css/11-feedback-refinements.css',
   './css/12-splash.css',
+  './css/13-ios-polish.css',
+  './css/14-viewport-and-overlays.css',
+  './css/15-v35-visual-restoration.css',
+  './css/16-floating-alarm-navigation.css',
   './src/app-controller.js',
   './src/config.js',
   './src/core/date-time.js',
@@ -36,6 +40,7 @@ const APP_SHELL = [
   './src/services/geolocation.js',
   './src/services/gym-checkin.js',
   './src/services/notifications.js',
+  './src/services/web-push.js',
   './src/services/water-reminders.js',
   './src/ui/celebrations.js',
   './src/ui/edge-back.js',
@@ -50,6 +55,7 @@ const APP_SHELL = [
   './src/views/workout.js',
   './src/views/progress.js',
   './src/views/exercise-detail.js',
+  './assets/branding/form-first-splash.mp4',
   './assets/branding/splash-poster.png',
   './assets/branding/splash-final-frame.png',
   './assets/nav/workout.png',
@@ -105,6 +111,65 @@ async function networkFirst(request) {
   }
 }
 
+async function respondToMediaRange(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const url = request.url;
+  let fullResponse = await cache.match(url);
+
+  if (!fullResponse) {
+    try {
+      fullResponse = await fetch(new Request(url, { method: 'GET' }));
+      if (isCacheable(fullResponse)) await putIfCacheable(cache, url, fullResponse);
+    } catch {
+      return new Response('Media unavailable offline', { status: 503, statusText: 'Offline' });
+    }
+  }
+
+  if (!fullResponse || !fullResponse.ok) return fullResponse || new Response('', { status: 404 });
+
+  const body = await fullResponse.arrayBuffer();
+  const total = body.byteLength;
+  const type = fullResponse.headers.get('Content-Type') || 'video/mp4';
+  const rangeHeader = request.headers.get('range') || '';
+  const match = rangeHeader.match(/^bytes=(\d*)-(\d*)$/);
+
+  if (!match || total === 0) {
+    return new Response(body, {
+      status: 200,
+      headers: { 'Content-Type': type, 'Content-Length': String(total), 'Accept-Ranges': 'bytes' }
+    });
+  }
+
+  let start;
+  let end;
+  if (match[1] === '') {
+    const suffixLength = Number(match[2]);
+    if (!Number.isFinite(suffixLength) || suffixLength <= 0) {
+      return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${total}` } });
+    }
+    start = Math.max(0, total - suffixLength);
+    end = total - 1;
+  } else {
+    start = Number(match[1]);
+    end = match[2] === '' ? total - 1 : Math.min(Number(match[2]), total - 1);
+  }
+
+  if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || start >= total || end < start) {
+    return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${total}` } });
+  }
+
+  const chunk = body.slice(start, end + 1);
+  return new Response(chunk, {
+    status: 206,
+    headers: {
+      'Content-Type': type,
+      'Content-Length': String(chunk.byteLength),
+      'Content-Range': `bytes ${start}-${end}/${total}`,
+      'Accept-Ranges': 'bytes'
+    }
+  });
+}
+
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(request);
@@ -125,10 +190,14 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Browsers commonly request MP4 media with Range. CacheStorage cannot safely
-  // treat a 206 partial response like a normal reusable asset, so leave ranges
-  // to the browser/network. The splash has poster/final-frame fallbacks offline.
-  if (request.headers.has('range')) return;
+  // Serve MP4 byte ranges from the cached full response. iOS Safari commonly
+  // requests video this way, including when the PWA is launched offline.
+  if (request.headers.has('range')) {
+    if (url.pathname.endsWith('.mp4')) {
+      event.respondWith(respondToMediaRange(request));
+    }
+    return;
+  }
 
   if (request.mode === 'navigate') {
     event.respondWith(networkFirst(request));
@@ -138,13 +207,43 @@ self.addEventListener('fetch', event => {
   event.respondWith(staleWhileRevalidate(request));
 });
 
+self.addEventListener('push', event => {
+  // WebKit requires a visible notification for every received push. Never use
+  // this event as a silent background data channel.
+  let payload = {};
+  try { payload = event.data ? event.data.json() : {}; }
+  catch { payload = { body: event.data?.text?.() || '' }; }
+
+  const title = typeof payload.title === 'string' && payload.title.trim()
+    ? payload.title.trim()
+    : 'Form First';
+  const options = {
+    body: typeof payload.body === 'string' ? payload.body : 'Your Form First update is ready.',
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+    tag: typeof payload.tag === 'string' ? payload.tag : 'form-first-update',
+    renotify: false,
+    data: { url: typeof payload.url === 'string' ? payload.url : './index.html' }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
-      const existingClient = clientList.find(client => 'focus' in client);
-      if (existingClient) return existingClient.focus();
-      return self.clients.openWindow ? self.clients.openWindow('./index.html') : undefined;
-    })
-  );
+  event.waitUntil((async () => {
+    const requestedUrl = event.notification.data?.url || './index.html';
+    let targetUrl = new URL('./index.html', self.registration.scope);
+    try {
+      const candidate = new URL(requestedUrl, self.registration.scope);
+      if (candidate.origin === self.location.origin) targetUrl = candidate;
+    } catch { /* Stay on the app home screen for malformed destinations. */ }
+
+    const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientList) {
+      if (!('focus' in client)) continue;
+      if (client.url !== targetUrl.href && 'navigate' in client) await client.navigate(targetUrl.href);
+      return client.focus();
+    }
+    return self.clients.openWindow ? self.clients.openWindow(targetUrl.href) : undefined;
+  })());
 });

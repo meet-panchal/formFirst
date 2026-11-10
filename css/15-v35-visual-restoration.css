@@ -1,0 +1,343 @@
+/* v41 — v35 visual restoration + edge-to-edge iPhone canvas.
+   Functional modules and state handling remain on the v40 architecture. */
+
+:root {
+  --bottom-nav-h: 50px;
+  --ff-page-gradient:
+    radial-gradient(circle at 12% 0%, rgba(255, 219, 89, .20), transparent 30%),
+    radial-gradient(circle at 100% 14%, rgba(255, 135, 58, .10), transparent 32%),
+    linear-gradient(180deg, #fffef9 0%, #f7f1e5 100%);
+  --ff-tab-material: rgba(255, 251, 241, .88);
+  --ff-tab-edge: rgba(17, 17, 17, .12);
+}
+
+html[data-theme="dark"] {
+  --ff-page-gradient:
+    radial-gradient(circle at 8% -2%, rgba(255, 229, 92, .055), transparent 28%),
+    radial-gradient(circle at 100% 8%, rgba(53, 198, 216, .045), transparent 30%),
+    linear-gradient(180deg, #141410 0%, #10100e 100%);
+  --ff-tab-material: rgba(22, 21, 18, .90);
+  --ff-tab-edge: rgba(216, 211, 201, .18);
+}
+
+/* One continuous canvas from the status area through every primary screen. */
+html,
+body,
+#app {
+  background: var(--ff-page-gradient) !important;
+}
+
+body::before {
+  background: var(--ff-page-gradient) !important;
+}
+
+.screen.note-theme,
+.screen.note-workout,
+.screen.nav-screen,
+.detail-screen {
+  background: var(--ff-page-gradient) !important;
+}
+
+/* The top bar is now part of the page canvas, not a separate cream slab. */
+.topbar,
+.note-topbar,
+.workout-topbar {
+  box-sizing: border-box !important;
+  min-height: calc(54px + var(--safe-top, env(safe-area-inset-top, 0px))) !important;
+  padding: calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 4px) 14px 4px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .note-topbar,
+html[data-theme="dark"] .workout-topbar {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Compact, themed tab bar. The iPhone home-indicator inset remains reserved,
+   but it is filled by the same translucent material instead of blank white. */
+.note-bottom-nav,
+#bottomNav {
+  box-sizing: border-box !important;
+  height: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  min-height: calc(var(--bottom-nav-h) + var(--safe-bottom)) !important;
+  padding: 1px 12px var(--safe-bottom) !important;
+  align-items: center !important;
+  background: var(--ff-tab-material) !important;
+  border-top: 1px solid var(--ff-tab-edge) !important;
+  box-shadow: 0 -4px 18px rgba(35, 28, 12, .045) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(22px) !important;
+  backdrop-filter: saturate(180%) blur(22px) !important;
+}
+
+.nav-item,
+.nav-item.active {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.nav-item .nav-icon,
+.nav-item.active .nav-icon,
+.nav-item .nav-icon img,
+.nav-item.active .nav-icon img {
+  width: 36px !important;
+  height: 36px !important;
+  object-fit: contain !important;
+}
+
+html[data-theme="dark"] .note-bottom-nav,
+html[data-theme="dark"] #bottomNav {
+  background: var(--ff-tab-material) !important;
+  border-top-color: var(--ff-tab-edge) !important;
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, .24) !important;
+}
+
+/* v35 Warm-up composition: copy on the left, cutout figure on the right.
+   Keep the v40 real <img> asset layer for reliable iOS first paint. */
+.warmup-flow.compact-warmup-flow {
+  position: relative !important;
+  isolation: isolate !important;
+  display: block !important;
+  min-height: clamp(132px, 37vw, 148px) !important;
+  padding: 13px 14px !important;
+  overflow: hidden !important;
+  border-radius: inherit !important;
+  background: #fbf7ee !important;
+  background-image: none !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+.warmup-summary,
+.warmup-copy {
+  display: contents !important;
+}
+
+.warmup-flow .warmup-illustration {
+  position: absolute !important;
+  z-index: 0 !important;
+  right: clamp(6px, 1.8vw, 10px) !important;
+  bottom: 0 !important;
+  inset: auto clamp(6px, 1.8vw, 10px) 0 auto !important;
+  display: block !important;
+  width: min(46%, 154px) !important;
+  height: clamp(128px, 36vw, 154px) !important;
+  max-height: 154px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  object-fit: contain !important;
+  object-position: right bottom !important;
+  opacity: .98 !important;
+  transform: none !important;
+  transition: none !important;
+  pointer-events: none !important;
+}
+
+.warmup-flow.compact-warmup-flow::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: linear-gradient(
+    90deg,
+    #fbf7ee 0%,
+    rgba(251, 247, 238, .99) 36%,
+    rgba(251, 247, 238, .92) 53%,
+    rgba(251, 247, 238, .55) 66%,
+    rgba(251, 247, 238, .12) 78%,
+    transparent 100%
+  ) !important;
+}
+
+.warmup-flow .warmup-label,
+.warmup-flow .warmup-heading,
+.warmup-flow .warmup-intro,
+.warmup-flow .warmup-details {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.warmup-flow .warmup-label,
+.warmup-flow .warmup-heading,
+.warmup-flow .warmup-intro {
+  width: auto !important;
+  max-width: calc(100% - clamp(118px, 34vw, 142px)) !important;
+}
+
+.compact-warmup-flow .warmup-label {
+  min-height: 31px !important;
+  padding: 0 14px !important;
+  margin: 0 0 9px !important;
+  font-size: 9.5px !important;
+}
+
+.compact-warmup-flow .warmup-heading {
+  font-size: clamp(22px, 6.5vw, 28px) !important;
+  line-height: 1.02 !important;
+  overflow-wrap: normal !important;
+}
+
+.compact-warmup-flow .warmup-intro {
+  margin: 7px 0 0 !important;
+  font-size: clamp(12px, 3.45vw, 13.5px) !important;
+  line-height: 1.28 !important;
+  text-wrap: pretty;
+}
+
+.warmup-flow .warmup-details {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  transform: translate3d(0, -8px, 0) !important;
+  border-top: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  transition:
+    max-height .36s cubic-bezier(.25, .8, .25, 1),
+    margin-top .36s cubic-bezier(.25, .8, .25, 1),
+    padding-top .36s cubic-bezier(.25, .8, .25, 1),
+    opacity .20s ease,
+    transform .32s cubic-bezier(.25, .8, .25, 1) !important;
+  will-change: max-height, opacity, transform;
+}
+
+.warmup.open .warmup-flow .warmup-details {
+  max-height: 320px !important;
+  margin-top: 10px !important;
+  padding: 11px 0 2px !important;
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+.warmup.open .warmup-flow .warmup-details::before {
+  content: "";
+  display: block;
+  width: calc(100% - clamp(96px, 29vw, 120px));
+  margin: -12px 0 12px;
+  border-top: 1px solid rgba(17, 17, 17, .10);
+}
+
+.warmup-flow .warmup-detail-name {
+  display: block;
+  margin-bottom: 4px;
+}
+
+html[data-theme="dark"] .warmup-flow.compact-warmup-flow {
+  background: #1c1b18 !important;
+}
+
+html[data-theme="dark"] .warmup-flow.compact-warmup-flow::before {
+  background: linear-gradient(
+    90deg,
+    rgba(28, 27, 24, .995) 0%,
+    rgba(28, 27, 24, .98) 38%,
+    rgba(28, 27, 24, .91) 54%,
+    rgba(28, 27, 24, .60) 67%,
+    rgba(28, 27, 24, .16) 79%,
+    rgba(28, 27, 24, 0) 100%
+  ) !important;
+}
+
+html[data-theme="dark"] .warmup-flow .warmup-heading {
+  color: var(--ff-dark-text) !important;
+}
+
+html[data-theme="dark"] .warmup-flow .warmup-intro,
+html[data-theme="dark"] .warmup-flow .warmup-details {
+  color: var(--ff-dark-secondary) !important;
+}
+
+html[data-theme="dark"] .warmup.open .warmup-flow .warmup-details::before {
+  border-top-color: rgba(216, 211, 201, .20) !important;
+}
+
+@media (max-width: 350px) {
+  .warmup-flow .warmup-illustration {
+    width: 36% !important;
+    height: 124px !important;
+  }
+  .warmup-flow .warmup-label,
+  .warmup-flow .warmup-heading,
+  .warmup-flow .warmup-intro {
+    max-width: calc(100% - 108px) !important;
+  }
+  .compact-warmup-flow .warmup-heading { font-size: 21px !important; }
+  .compact-warmup-flow .warmup-intro { font-size: 11.5px !important; }
+}
+
+@media (min-width: 400px) and (max-width: 480px) {
+  .warmup-flow .warmup-label,
+  .warmup-flow .warmup-heading,
+  .warmup-flow .warmup-intro {
+    max-width: calc(100% - 146px) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warmup-flow.compact-warmup-flow,
+  .warmup-flow .warmup-illustration {
+    transition: none !important;
+    animation: none !important;
+  }
+  .warmup-flow .warmup-details {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Restore the compact v35 Settings rhythm while retaining v40's scroll/gesture
+   behavior and current controls. */
+.settings-sheet {
+  padding: 7px 15px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.settings-grabber { margin-bottom: 8px !important; }
+.settings-header { padding: 0 1px 8px !important; }
+.settings-header h2 {
+  margin: 0 !important;
+  font-size: 25px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.025em !important;
+}
+.settings-group { border-radius: 16px !important; }
+.settings-row {
+  min-height: 62px !important;
+  padding: 10px 13px !important;
+  gap: 12px !important;
+}
+.settings-row-copy { gap: 2px !important; }
+.settings-row-copy strong { font-size: 14px !important; }
+.settings-row-copy small {
+  font-size: 11.5px !important;
+  line-height: 1.3 !important;
+  max-width: 31ch !important;
+}
+.settings-dev-note {
+  padding: 7px 5px 0 !important;
+  font-size: 11px !important;
+  line-height: 1.32 !important;
+}
+.settings-action-row { min-height: 64px !important; padding: 10px 13px !important; }
+.week-reset-confirm { padding: 12px 13px !important; }

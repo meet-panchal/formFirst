@@ -2,18 +2,37 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f3f4ea" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#fffef9" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Form First" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="description" content="Form First — mobile-first five-day training plan with exercise form guidance and set logging." />
-  <script>try{const s=JSON.parse(localStorage.getItem('formfirst-5day-plan-v2')||'{}');document.documentElement.dataset.theme=s.darkMode?'dark':'light';document.documentElement.style.colorScheme=s.darkMode?'dark':'light'}catch(e){}</script>
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
-  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
-  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
-  <link rel="apple-touch-startup-image" href="./assets/branding/splash-poster.png" />
+
+  <script>
+    try {
+      const saved = JSON.parse(localStorage.getItem('formfirst-5day-plan-v2') || '{}');
+      const dark = saved.darkMode === true;
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]')?.setAttribute(
+        'content',
+        dark ? '#141410' : '#fffef9'
+      );
+    } catch {
+      // Keep the default theme if local storage is unavailable.
+    }
+  </script>
+
+  <!-- Files in Vite's public directory are referenced with root-absolute URLs.
+       Vite rebases these URLs for the configured deployment base path. -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+  <link rel="apple-touch-startup-image" href="/assets/branding/splash-poster.png" />
+
+  <!-- Application styles: Vite combines these into the production CSS bundle. -->
   <link rel="stylesheet" href="./css/01-base.css" />
   <link rel="stylesheet" href="./css/02-exercise-detail.css" />
   <link rel="stylesheet" href="./css/03-workout.css" />
@@ -26,31 +45,56 @@
   <link rel="stylesheet" href="./css/10-feedback.css" />
   <link rel="stylesheet" href="./css/11-feedback-refinements.css" />
   <link rel="stylesheet" href="./css/12-splash.css" />
+  <link rel="stylesheet" href="./css/13-ios-polish.css" />
+  <link rel="stylesheet" href="./css/14-viewport-and-overlays.css" />
+  <link rel="stylesheet" href="./css/15-v35-visual-restoration.css" />
+  <link rel="stylesheet" href="./css/16-floating-alarm-navigation.css" />
+
   <title>Form First · 5-Day Plan</title>
 </head>
 <body>
   <div id="brandSplash" class="brand-splash" aria-hidden="true">
-    <video id="brandSplashVideo" class="brand-splash-media" muted playsinline preload="auto" poster="./assets/branding/splash-poster.png">
-      <source src="./assets/branding/form-first-splash.mp4" type="video/mp4" />
+    <video
+      id="brandSplashVideo"
+      class="brand-splash-media"
+      muted
+      autoplay
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      poster="/assets/branding/splash-poster.png"
+    >
+      <source src="/assets/branding/form-first-splash.mp4" type="video/mp4" />
     </video>
-    <img id="brandSplashFinal" class="brand-splash-media brand-splash-final" src="./assets/branding/splash-final-frame.png" alt="" />
+    <img
+      id="brandSplashFinal"
+      class="brand-splash-media brand-splash-final"
+      src="/assets/branding/splash-final-frame.png"
+      alt=""
+    />
   </div>
 
   <div id="app" class="app" aria-live="polite"></div>
 
   <nav class="bottom-nav note-bottom-nav ios-tabbar" id="bottomNav" aria-label="Primary navigation">
     <button class="nav-item active" type="button" data-nav="workout" aria-label="Workout" title="Workout">
-      <span class="nav-icon supplied-nav-icon" aria-hidden="true"><img src="./assets/nav/workout.png" alt="" draggable="false" /></span>
+      <span class="nav-icon supplied-nav-icon" aria-hidden="true">
+        <img src="/assets/nav/workout.png" alt="" draggable="false" />
+      </span>
     </button>
     <button class="nav-item" type="button" data-nav="progress" aria-label="Progress" title="Progress">
-      <span class="nav-icon supplied-nav-icon" aria-hidden="true"><img src="./assets/nav/progress.png" alt="" draggable="false" /></span>
+      <span class="nav-icon supplied-nav-icon" aria-hidden="true">
+        <img src="/assets/nav/progress.png" alt="" draggable="false" />
+      </span>
     </button>
     <button class="nav-item" type="button" data-nav="timer" aria-label="Timer" title="Timer">
-      <span class="nav-icon supplied-nav-icon" aria-hidden="true"><img src="./assets/nav/timer.png" alt="" draggable="false" /></span>
+      <span class="nav-icon supplied-nav-icon" aria-hidden="true">
+        <img src="/assets/nav/timer.png" alt="" draggable="false" />
+      </span>
     </button>
   </nav>
 
-  <script src="./splash.js"></script>
+  <script type="module" src="./splash.js"></script>
   <script type="module" src="./src/app-controller.js"></script>
 </body>
 </html>

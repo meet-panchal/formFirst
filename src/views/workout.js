@@ -100,10 +100,15 @@ export function buildWorkoutMarkup({
       </section>
       <section class="section note-section compact-warmup-section">
         <article class="group-card warmup note-group-card ${warmupOpen ? 'open' : ''}" id="warmupCard" aria-expanded="${warmupOpen ? 'true' : 'false'}">
-          <div class="warmup-flow compact-warmup-flow" id="warmupToggle" role="button" tabindex="0" aria-expanded="${warmupOpen ? 'true' : 'false'}" aria-label="Show warm-up notes" style="--warmup-figure:url('${day.warmup.image || './assets/warmup/upper-body-mobility-cutout-cropped.webp'}')">
-            <span class="warmup-label">Warm-up</span>
-            <strong class="warmup-heading">${day.warmup.duration}</strong>
-            <p class="warmup-intro">${day.warmup.intro}</p>
+          <div class="warmup-flow compact-warmup-flow" id="warmupToggle" role="button" tabindex="0" aria-expanded="${warmupOpen ? 'true' : 'false'}" aria-label="Show warm-up notes">
+            <div class="warmup-summary">
+              <div class="warmup-copy">
+                <span class="warmup-label">Warm-up</span>
+                <strong class="warmup-heading">${day.warmup.duration}</strong>
+                <p class="warmup-intro">${day.warmup.intro}</p>
+              </div>
+              <img class="warmup-illustration" src="${day.warmup.image || './assets/warmup/upper-body-mobility-cutout-cropped.webp'}" alt="" aria-hidden="true" draggable="false" loading="eager" decoding="async" />
+            </div>
             <div class="warmup-details"><strong class="warmup-detail-name">${day.warmup.name}</strong>${day.warmup.details} Keep the effort easy and use the warm-up to check how your joints and movement feel before the first working set.</div>
           </div>
         </article>

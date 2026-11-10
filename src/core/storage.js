@@ -11,6 +11,7 @@ const DEFAULT_STATE = Object.freeze({
   developmentMode: false,
   waterReminderEnabled: false,
   waterReminderNextAt: null,
+  webPushEnabled: false,
   darkMode: false
 });
 
@@ -49,6 +50,7 @@ function normalizeState(saved = {}) {
     developmentMode: Boolean(source.developmentMode),
     waterReminderEnabled: Boolean(source.waterReminderEnabled),
     waterReminderNextAt: Number.isFinite(nextReminderAt) ? nextReminderAt : null,
+    webPushEnabled: Boolean(source.webPushEnabled),
     darkMode: Boolean(source.darkMode)
   };
 
